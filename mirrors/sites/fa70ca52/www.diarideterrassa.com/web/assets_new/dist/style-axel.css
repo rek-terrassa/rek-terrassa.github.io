@@ -1,0 +1,69 @@
+.ad-wrapper-side { display: none; }
+div#content-sticky { display: flex; position: fixed; bottom: 0; text-align: center; background: var(--neutral-white); border-top: 1px solid #ccc; width: 100%; padding: .5rem; z-index: 5; }
+#content-sticky div, #content-sticky iframe { margin: auto !important }
+/* btn togle stcky publicidad */
+#content-sticky { -moz-transition: all 0.5s ease-in-out; -o-transition: all 0.5s ease-in-out; -webkit-transition: 0.5s all ease-in-out; transition: all 0.5s ease-in-out; }
+#content-sticky .toggle-button { position: absolute; top: -28px; right: 0; opacity: 1; background-color: #ffffff; color: var(--gray-2); border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 14px; z-index: 1001; border-radius: 3px 2px 0 0; box-shadow: 0px -1px 3px 0px rgba(0, 0, 0, 0.2); width: 28px; height: 28px; font-family: var(--font-1); font-weight: bold; text-align: center; display: flex; justify-content: center; align-items: center; }
+#content-sticky.hidden { bottom: -105px; }
+@media (max-width: 1500px) {
+ .skyscraper#sky1 { right: 1205px; }
+.skyscraper#sky2 { left: 1205px; }
+ }
+@media (min-width: 1200px) {
+ .ad-wrapper-side { display: block; position: relative; z-index: 3; overflow-x: visible; height: 1px; top: 200px; flex: 0 0 auto; width: 100%; transition: top 0.3s ease-in; max-width: 1724px; min-width: 1724px; transform: translate(-50%, 0); -webkit-transform: translate(-50%, 0); left: 50%; }
+.ad-wrapper-side-left, .ad-wrapper-side-right { position: absolute; z-index: 1; margin: 0 auto; background-color: transparent; height: 100%; /*background-color: #f3f3f3; border: solid 1px black; */
+        height: auto; width: 250px; display: flex; max-height: calc(100vh - 180px); object-fit: cover; }
+.ad-wrapper-side-left { left: 0; top: 0; justify-content: flex-end; }
+.ad-wrapper-side-right { right: 0; top: 0; justify-content: flex-start; }
+.ad-wrapper-side-left .ad { float: left; overflow: hidden; }
+.ad-wrapper-side-right .ad { float: right; overflow: hidden; margin-right: 0; margin-top: 0; }
+.ad-wrapper-side.fix-top { position: fixed; top: 100px; }
+.ad-wrapper-side.fix-top .ad-wrapper-side-left, .ad-wrapper-side.fix-top .ad-wrapper-side-right { max-height: calc(100vh - 110px); }
+ }
+@media (max-width: 1485px) {
+ .ad-wrapper-side { display: none; }
+ }
+@media (max-width: 767px) {
+ div#content-sticky { display: block; z-index: 4147483647; /*overflow-x: hidden !important; */
+        width: 100%; }
+ }
+/*.header-redactor,
+.container-redactor { display: none; }
+*/
+.wrap-FICHA-ARTICULO.ficha-articulo-opinion .container .row .col .wrap-FULL .CONTENIDO-ARTICULO .art-cuerpo p:first-of-type::first-letter { font-size: 4em; /* Ajusta el tamaño para que ocupe toda la altura */
+    font-weight: bold; float: left; /* Hace que el texto fluya a su lado */
+    margin-right: 15px; /* Espacio entre la letra y el texto */
+    line-height: 1; /* Mantiene la alineación correcta */ }
+/* ESTILOS PARA PUBLICIDAD STYCKY EN PORTADAS */
+/* Asegurarte que el contenedor .BN tenga position: relative */
+.TRIPLE_SUPERIOR .BN { position: relative; height: 100%; /*overflow: hidden; */ }
+.TRIPLE_SUPERIOR .BN > div { min-height: 300px!important; }
+.TRIPLE_SUPERIOR .third-wrap > div,
+.TRIPLE_SUPERIOR .third-wrap .wrap_three > div { height: 100%; }
+/* Cuando la publi está fija al top */
+.fixed_add { z-index: 1; /* Asegura que quede encima */ }
+/* Si el div interior necesita un ancho fijo, aplicalo directamente */
+.fixed_add > * { width: inherit; }
+/* Cuando la publi se pega al fondo del contenedor */
+.stick-bottom { z-index: 1; /* Puede ser más bajo si querés que quede debajo de algo */ }
+/* ESTILOS PARA PUBLICIDAD STYCKY EN PORTADILLAS */
+.CONTENIDO-DER .BN { height: 100%; }
+/* ESTILOS PARA PUBLICIDAD STYCKY Y TODO TIPO DE PUBLI EN ART. CUERPO */
+.wrap-FICHA-ARTICULO .container .row .col .wrap-FULL .CONTENIDO-ARTICULO .art-cuerpo .BN iframe { width: auto !important; }
+.container-mega.ultimo-mega { margin-top: 24px; }
+.wrap-FICHA-ARTICULO .COLUMNA-DER .BN { height: 100%; }
+@media(max-width: 767px) {
+ .container-mega.ultimo-mega { margin-top: 0; }
+.listado_notis ul li { width: calc(50% - 6px); }
+.listado_notis ul li img { min-height: 91px; }
+.wrap-FICHA-ARTICULO .container .row .col .wrap-FULL .COLUMNA-DER { margin-top: 24px; padding-top: 12px; border-top: 1px solid rgba(122, 124, 125, 0.2); }
+.COLUMNA-DER .ara-portada { margin-top: 0; }
+.art-autor-foot-noticia { margin-top: 0; }
+.container-autor-footer-noticia { flex-direction: column; gap: 12px; }
+.container-autor-footer-noticia .redactor a { margin-bottom: 0; }
+.container-autor-footer-noticia.flex-column .container-descripcion-autor { margin-top: 0; }
+.wrap-FICHA-ARTICULO .container .row .col .wrap-FULL .CONTENIDO-ARTICULO .art-cuerpo { margin-bottom: 0; }
+.art-cuerpo .BN { max-width: 300px; margin: 0 auto; }
+.art-cuerpo .BN > div { max-width: 300px; }
+ }
+.COLUMNA-DER div[id^="google_ads_iframe"] { display: block!important; }
