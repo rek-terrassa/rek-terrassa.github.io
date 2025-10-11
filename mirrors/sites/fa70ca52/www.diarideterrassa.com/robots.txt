@@ -1,0 +1,21 @@
+User-agent: PetalBot
+Disallow: /
+
+User-agent: sentibot
+Disallow: /
+User-agent: SentiBot
+Disallow: /
+
+User-agent: *
+Allow: /
+Disallow: /?s=*
+
+User-agent: *
+Allow: /
+
+
+Sitemap: https://www.diarideterrassa.com/sitemaps/sitemap-news.xml
+Sitemap: https://www.diarideterrassa.com/sitemaps/sitemap-hemeroteca.xml
+Sitemap: https://www.diarideterrassa.com/sitemaps/categories-sitemap.xml
+Sitemap: https://www.diarideterrassa.com/sitemaps/authors-sitemap.xml
+Sitemap: https://www.diarideterrassa.com/sitemaps/tags-sitemap.xml
