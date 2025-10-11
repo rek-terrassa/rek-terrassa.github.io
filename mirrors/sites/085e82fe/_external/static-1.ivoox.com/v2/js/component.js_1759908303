@@ -1,0 +1,400 @@
+var component = typeof component === 'undefined' ? {} : component;
+
+component = {
+    init: function() {
+
+    },
+    form:{
+        /*fillSuggestedTagsByCat: function(category, target, fire){
+            console.log("fill");
+            $(target).load('suggested-tags_ut_'+category+'_1.html',function(){
+               $(fire).click();
+            });
+        },*/
+        fillSuggestedTagsByCat: function(category){
+
+            var content = "";
+
+            $.ajax({
+                url: 'ajx-suggested-tags_ut_'+category+'_1.html',
+                type: 'get',
+                dataType: 'html',
+                async: false,
+                success: function(data){
+                    content = data;
+                }
+            });
+
+            return content;
+        },
+        uploadFile: function (files){
+
+        }
+    },
+    accesible:{
+        setContent: function(element,content){
+            element.html(content);
+        },
+        fillAccesibleSuggestedTagsByCat: function(category){
+            $.ajax({
+                url: 'ajx-suggested-tags_u8_'+category+'_1.html',
+                type: 'get',
+                dataType: 'html',
+                async: false,
+                success: function(data){
+                    content = data;
+                }
+            });
+
+            return content;
+        }
+    },
+    audio:{
+        deleteHistoryAudioByAudioId: function(event){
+            event.preventDefault();
+            var btn = $(this);
+            var id  = btn.data('id');
+            var el  = "#history_"+id;
+            var url = btn.attr('href');
+
+            common.ajax.doRequest(url, {
+                limit: 4
+            },
+                function(response) {
+                        $('.popover-remove').remove();
+                        $(el).fadeOut(800,function(){
+                            $(el).remove();
+                            $(btn.data('target')).html(response);
+                        });
+
+                    btn.removeClass("processing");
+                },
+                function(response) {
+                    btn.removeClass("processing");
+                }
+            );
+
+        }
+    },
+    ajax_link:{
+        send: function(element){
+            var $el             = element,
+                trigger         = $el.attr('data-trigger'),
+                callback        = $el.attr('data-callback'),
+                reset_state     = $el.text(),
+                loading_state   = $el.attr('data-loading-text'),
+                complete_state  = $el.attr('data-complete-text'),
+                redirect        = $el.attr('data-redirect'),
+                reload          = $el.attr('data-reload');
+            var href = (typeof($el.attr('data-url'))  === 'undefined') ? $el.attr('href') : $el.attr('data-url');
+            var type = (typeof($el.attr('data-type')) === 'undefined') ? 'JSON' : $el.attr('data-type') ;
+
+            //if(loading_state)    $el.button('loading');
+            if(loading_state)    $el.text(loading_state);
+            console.log(href);
+            $.ajax({
+                url:    href,
+                type:   'POST',
+                dataType: type,
+                success: function(resp){
+
+                    /*if(complete_state)      $el.button('complete');
+                    else if(loading_state)  $el.button('reset');*/
+
+                    if(complete_state)      $el.text(complete_state);
+                    else if(loading_state)  $el.text(reset_state);
+
+                    if(trigger == "popover"){
+
+                        var popoverStyle = (resp.status == "error") ? "popover-error" : "popover-success",
+                            template = '<div class="popover '+popoverStyle+'" role="tooltip"><div class="arrow"></div>' +
+                         '<div class="popover-content"></div></div>';
+
+                        $el.popover({
+                            html:     true,
+                            content:  resp.message,
+                            template: template,
+                            trigger:  'click'
+                        });
+                        $el.popover('show');
+
+                    }else if(trigger == "tab"){
+                    	var container = $el.attr('data-container');
+                    	$(container).html(resp);
+                	}
+
+                	if (callback) {
+                        window[callback]($el);
+                    }
+
+                    if (redirect || (reload && reload != "false")){
+                        setTimeout(function(){
+                            if(redirect) window.location.href = redirect;
+                            if(reload && reload != "false")  location.reload();
+                        },750);
+                    }
+                },
+                error: function(){
+                    console.log("KO - No response");
+                }
+            });
+        }
+    },
+    pagination:{
+        load: function(element){
+            var $el             = element,
+                href            = $el.attr('data-href'),
+                page			= parseInt($el.attr('data-page')),
+                target          = $el.attr('data-target'),
+                loading_state   = $el.attr('data-loading-text'),
+            	loader			= $el.attr('data-loader');
+
+            var href_after = "";
+            if($el.attr('data-href-after') != null)href_after		= $el.attr('data-href-after');
+
+            $el.attr('data-status','loading');
+            $(target).append('<div id="loader" class="row text-center"><div class="col-md-12"><br><img src="'+loader+'"></div></div>');
+
+            $.ajax({
+                url:    href+'_'+page+'.html'+href_after,
+                type:   'POST',
+                dataType: 'HTML',
+                success: function(resp){
+                	$el.attr('disabled',false);
+
+                	if(!$.isEmptyObject($.trim(resp))){
+
+                        $(target).append(resp);
+
+                        if($("[data-type=popover-info]").length > 0){
+                            $("[data-type=popover-info]").popover({placement:'bottom', container: 'body',trigger: 'click'});
+                        }
+                        $el.attr('data-page',page+1);
+                        $el.attr('data-status','enabled');
+                	}
+                    else{
+                		$el.attr('data-status','disabled');
+                	}
+
+                	$(window).trigger("resize");
+                	$('#loader').remove();
+
+                }
+            });
+        },
+        isActive: function(element){
+        	return (element.attr('data-status') == 'enabled') ? true : false;
+        },
+        infiniteScroll: function(element){
+            var wrapper = $(element).data("wrapper") ? $(element).data("wrapper") : false;
+            var target = $("[data-type='infinite']").data("target");
+
+
+            if (wrapper){
+                var footerHeight = $(wrapper).height(),
+                    windowHeight = $(element).height();
+                if($(wrapper).scrollTop() >= (windowHeight - footerHeight) && this.isActive(element)){
+                    this.load(element);
+                }
+            }
+            else{
+                var footerHeight = $('footer').height(),
+                    windowHeight = $(document).height()-$(window).height();
+                if($(window).scrollTop() >= (windowHeight - footerHeight) && this.isActive(element)){
+                    this.load(element);
+                }
+            }
+        }
+    },
+    pop_over:{
+        close: function(element){
+            element.popover('hide');
+        },
+        show: function(element,type,content,container){
+
+            if(container == '' || !container) container = 'body';
+            element.popover('destroy');
+
+            var template = this.getTemplateByType(type),
+                placement= (element.data('placement')) ? element.data('placement') : 'bottom';
+
+            element.popover({
+                template:   template,
+                content:    content,
+                html:       true,
+                container:  container,
+                trigger:    'click',
+                placement:  placement
+            });
+            element.popover('show');
+        },
+        setContent: function(element,content){
+            var pop = element.data('bs.popover');
+            pop.options.content = content;
+            element.popover('show');
+        },
+        getTemplateByType: function(type){
+            switch (type){
+	            case 'popover-info':
+	                return '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+	            break;
+                case 'popover-remove':
+                    return '<div class="popover popover-remove" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>';
+                break;
+                case 'popover-categoria':
+                    return '<div class="popover popover-categoria" role="tooltip"><div class="arrow"></div><a href="#" class="popover-close"></a><div class="popover-content"></div></div>';
+                break;
+                case 'popover-etiquetas':
+                    return '<div class="popover popover-categoria popover-etiquetas" role="tooltip"><div class="arrow"></div><a href="#" class="popover-close"></a><div class="popover-content"></div></div>';
+                break;
+            }
+
+        }
+    },
+    /*pop_over:{
+        init: function(attr){
+            console.log(attr);
+            var template = (attr.template) ? attr.template : '<div class="popover popover-remove" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>',
+                buttons  = (attr.buttons) ? attr.buttons : "",
+                el       = (attr.element) ? attr.element: $(this),
+                message  = (el.data('confirm-text')) ? "<span>" + el.data('confirm-text') + "</span>" : "",
+                info     = (el.data('info-txt')) ? "<div class='info-txt'>" + el.data('info-txt') + "</div>" : ""
+                content  = info + message + buttons;
+
+                el.popover({
+                    content: content,
+                    template: template,
+                    container: 'body',
+                    html: true,
+                    //trigger: 'focus',
+                    trigger: 'click',
+                    placement:'bottom'
+                });
+        },
+        show: function(element){
+            element.popover('show');
+        }
+    },*/
+    subscription: {
+        /*
+         * HTML Declaration:
+         *  <button data-role="mailNotify" data-url="controllerpage.html" data-success="#id_div_ok" data-error="#id_div_ko">
+         *
+         * HTML Binding:
+         *  $('button[data-role="mailNotify"]').off('click').on('click', component.subscription.mailNotification);
+         */
+        mailNotification:function(event) {
+            event.preventDefault();
+            var btn = $(this);
+            if (btn.hasClass('processing')) { return; }
+            else                            { btn.addClass('processing'); }
+
+            var url = btn.data('url');
+            var suc = btn.data('success');
+            var err = btn.data('error');
+
+            common.ajax.doRequest(url, {},
+                    function(response) {
+                        if (response.status == 'ok') {
+                            if (response.mailNotification =='ok'){
+                                $(suc).removeClass('hidden');
+                            }
+                            else{
+                                $(err).removeClass('hidden');
+                            }
+                            btn.addClass('hidden');
+                        }
+                        btn.removeClass("processing");
+                    },
+                    function(response) {
+                        btn.removeClass("processing");
+                    }
+            );
+
+            btn.removeClass("processing");
+        },
+
+        /*
+         * HTML Declaration:
+         *  <button data-role="mailSubscription" data-url="controllerpage.html" data-success="#id_div_ok" data-error="#id_div_ko">
+         *
+         * HTML Binding:
+         *  $('button[data-role="mailSubscription"]').off('click').on('click', component.subscription.mailSubscription);
+         */
+        mailSubscription: function(event) {
+            event.preventDefault();
+            var btn = $(this);
+            if (btn.hasClass('processing')) { return; }
+            else                            { btn.addClass('processing'); }
+
+            var url     = $(this).data('url');
+            var suc     = btn.data('success');
+            var err     = btn.data('error');
+            var mail    = $("input[id='mail']").val();
+
+            if (url && mail){
+                common.ajax.doRequestGet(url+mail, {},
+                    function(response) {
+                        if (response.status == 'ok') {
+                            if (response.mailNotification =='ok'){
+                                $(suc).removeClass('hidden');
+                                $('#modal_subscription_h4').addClass("hidden");
+                                $('#modal_subscription_h4_ok').removeClass("hidden");
+                                $('#mail-app').val($('#mail').val());
+								if ($('#ifrm_gdpr') != undefined){
+									$('#ifrm_gdpr').addClass("hidden");
+								}
+                            }
+                            else{
+                                if(response.maxSubscriptionsWithoutRegistration == 'true'){
+                                    $('#max_suscriptions').removeClass('hidden');
+                                    $('#modal_register').addClass('hidden');
+                                }else{
+                                    $(err).removeClass('hidden');
+                                }
+                            }
+                            $('.also_hidden').addClass('hidden');
+                        }
+                        btn.parent().addClass('hidden');
+                        btn.removeClass("processing");
+                    },
+                    function(response) {
+                        //console.log('<subscription.mailSubscription> error');
+                        //console.log ('RESPONSE ERR: ' + JSON.stringify(response));
+                        btn.removeClass("processing");
+                    });
+            }
+            btn.removeClass("processing");
+        },
+        mailAPP: function(event) {
+            event.preventDefault();
+            var btn = $(this);
+            if (btn.hasClass('processing')) { return; }
+            else                            { btn.addClass('processing'); }
+
+            var url     = $(this).data('url');
+            var suc     = btn.data('success');
+            var err     = btn.data('error');
+            var mail    = $("input[id='mail']").val();
+
+            if (url && mail){
+                common.ajax.doRequestGet(url+mail, {},
+                    function(response) {
+                        if (response.status == 'ok') {
+                            $(suc).removeClass('hidden');
+                        }else{
+                            $(err).removeClass('hidden');
+                        }
+                        btn.parent().addClass('hidden');
+                        btn.removeClass("processing");
+                    },
+                    function(response) {
+                        //console.log('<subscription.mailSubscription> error');
+                        //console.log ('RESPONSE ERR: ' + JSON.stringify(response));
+                        btn.removeClass("processing");
+                    });
+            }
+            btn.removeClass("processing");
+        }
+    }
+}
