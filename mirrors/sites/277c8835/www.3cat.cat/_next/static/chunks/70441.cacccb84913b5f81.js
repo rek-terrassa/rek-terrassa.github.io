@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[70441],{70441:function(t,e,a){a.r(e);var c=a(73958),l=a(81742),s=a.n(l),u=a(52322);e.default=function(t){var e=t.text;return e=(e=e.replaceAll('"',"")).replaceAll("&quot;",""),(0,u.jsx)(c.default,{text:e,dataTestId:"cos-noticia-cita",className:s().cita})}}}]);
+//# sourceMappingURL=70441.cacccb84913b5f81.js.map
