@@ -1,0 +1,930 @@
+/** player **/
+(function(){
+
+function secondsToTime(seconds) {
+    seconds = Math.ceil(seconds);
+
+    var hours = parseInt( seconds / 3600 ) % 24;
+    hours = hours < 10 ? "0" + hours : hours;
+
+    var minutes = parseInt( seconds / 60 ) % 60;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+
+    var seconds = seconds % 60;
+    seconds = seconds  < 10 ? "0" + seconds : seconds;
+
+    return (hours != "00" ? hours+"h " : "") + (minutes != "00" ? minutes+"min " : "") + seconds + "s";
+}
+
+$(document).on("click", ".player-playlist .player-buttons .play, .player-playlist .player-buttons .stop", function(event){
+    event.preventDefault();
+    toggleSong($(this).data("song-id"), $(this).parents(".player-playlist"));
+    $(this).toggleClass("play stop");
+});
+
+$(".carousel-playlist-authors .item a").click(function(event){
+    event.preventDefault();
+    var $player = $($(this).data("parent"));
+    var songId = $(this).data("song-id");
+    // cargar esta cancion y reproducirla?
+    //toggleSong(songId, $player);
+});
+
+$("a[data-timebar-toggle]").click(function(event){
+    event.preventDefault();
+
+    var circleProgress = $(this).data("circle-progress");
+    var $player = $($(this).data("timebar-toggle"));
+
+    if (circleProgress) {
+        var circleProgressPlugin = $(this).data("circle-progress-plugin");
+        circleProgressPlugin ? toggleSongCircleProgress($(this)) : playSongCircleProgress($(this).data("song-id"), $(this));
+    }
+
+    toggleSong($(this).data("song-id"), $player);
+
+    if ($(this).data("player-toggle-class")) {
+        $(this).toggleClass("play pause");
+    }
+});
+
+function loadSong(songId, $player) {
+    /*
+     TODO: obtenemos los datos del json por ajax
+     */
+    var json = {img: 'img/dummy/img10.jpg', duration: 10};
+
+    if (typeof $player != 'undefined') {
+        $player.find(".song-img").attr("src", json.img);
+    }
+
+    return json;
+}
+
+var timer;
+
+function toggleSong(songId, $player) {
+/*
+    if (!songId) {
+        console.log("Invalid song");
+        return;
+    }
+
+    if ($player.data("currentSongId") && $player.data("currentSongId") == songId && timer) {
+        // toggle
+        timer.pause();
+        return;
+    }
+
+    if (timer) {
+        // si hay un timer activo lo detenemos
+        timer.stop();
+    }
+
+    var song = loadSong(songId, $player);
+
+    var $currentTimebar = $player.find(".current-timebar");
+    var $time = $currentTimebar.next();
+
+    var duration = song.duration;
+
+    var $timeBar = $player.hasClass("player-timebar") ? $player : $player.find(".player-timebar");
+
+    timer = Tock({
+        countdown: true,
+        interval: 200,
+        callback: function (tock) {
+            var elapsedTime = duration-tock.lap()/1000;
+            var timePer = (elapsedTime*100/duration);
+            var playerWidth = $timeBar.width();
+            var currentTimeWidth = playerWidth*timePer/100;
+            if (currentTimeWidth < 1) currentTimeWidth = 1;
+
+            $currentTimebar.width(currentTimeWidth+"px");
+
+            $time.text("-"+secondsToTime(tock.lap()/1000));
+
+            if (currentTimeWidth+$time.width() > playerWidth) {
+                $time.css("right", "5px").css("left", "auto");
+            } else {
+                $time.css("left", currentTimeWidth+"px").css("right", "auto");
+            }
+        },
+        complete: function () {
+            $player.find(".play, .stop").toggleClass("play stop");
+            timer = null;
+        }
+    });
+
+    timer.start(duration*1000);
+
+    $player.data("currentSongId", songId);*/
+}
+
+function playSongCircleProgress(songId, $button) {
+    var song = loadSong(songId);
+
+    options = {
+        img1: 'img/circle-2.png',
+        img2: 'img/circle-1.png',
+        duration: song.duration,
+        onComplete: function() {
+            $button.data("circle-progress-plugin", null);
+            $button.removeClass("pause").addClass("play");
+        }
+    };
+
+    plugin = $button.find(".circle-progress").empty().circularProgress(options);
+    $button.data("circle-progress-plugin", plugin);
+}
+
+function toggleSongCircleProgress($button) {
+    var circleProgressPlugin = $button.data("circle-progress-plugin");
+    circleProgressPlugin.toggle();
+}
+
+var $carouselPlaylists = $("#carousel-playlists");
+
+if($carouselPlaylists.length == 1) {
+    var $carouselPaginator = $("section.por-donde-empezar ul.lists li");
+    $carouselPaginator.find("a").click(function(event){
+        event.preventDefault();
+        $carouselPaginator.removeClass("active");
+        $(this).parent().addClass("active");
+    });
+    $carouselPlaylists.on('slid.bs.carousel', function () {
+        var $playlistAuthors = $(this).find(">.carousel-inner>.item.active .carousel-playlist-authors");
+        var $active = $playlistAuthors.find(">.carousel-inner>.item.active");
+        if ($active.length == 0) {
+            $playlistAuthors.find(">.carousel-inner>.item:first-child").addClass("active");
+        }
+    })
+}
+
+})();
+
+function setSameHeight(parents, childsSelector, minOrMax, options) {
+    $parents = typeof(parents) == "string" ? $(parents) : parents;
+
+    var minOrMax = typeof minOrMax == "undefined" ? "max" : minOrMax;
+
+    $parents.each(function(){
+        var $divs = $(this).find(childsSelector);
+        $divs.height("auto");
+        var heights = $divs.map(function(i, e){
+            return $(e).outerHeight();
+        }).get();
+        var height = Math[minOrMax].apply(null, heights) || 0;
+
+        if (height > 0) {
+            $divs.css("height", height+"px");
+            if (options && typeof options.callback != "undefined") {
+                options.callback($(this), height);
+            }
+        }
+    });
+}
+
+$(window).resize(function(){
+    setSameHeight(".modulo-lista .flipper", ">div", "max", {
+        callback: function($parent, height) {
+            $parent.height(height);
+        }
+    });
+}).trigger("resize");
+
+
+/* flips */
+$(document).on("click", ".modulo-view .footer-modulo .plus, .modulo-view .footer-modulo .config, " +
+    ".modulo-add-options .header-modulo span.close," +
+    ".popover-lista span.close, .popover-lista .volver a", function(event){
+    event.preventDefault();
+    if(!$(this).hasClass("fan-sus-js")) {
+        $(this).parents(".flip-container").toggleClass("hover");
+    }
+});
+
+$(".modulo-add-options a[data-slide-modulo]").click(function(event){
+    event.preventDefault();
+    var slide = $(this).data("slide-modulo");
+    $(this).parents(".flipper").find(slide).addClass("active");
+});
+$(".modulo-view-default.slide span.close").click(function(event){
+    event.preventDefault();
+    var self = this;
+    $(this).parents(".flip-container").toggleClass("hover");
+    window.setTimeout(function() {
+        $(self).parents(".slide").removeClass("active");
+    }, 100);
+});
+$(".modulo-view-default.slide h4.volver a").click(function(event){
+    event.preventDefault();
+    $(this).parents(".slide").removeClass("active");
+});
+
+$(".modulo-view .footer-modulo .play a, .header-ficha2 .player-bar .button .play a").click(function(event){
+    event.preventDefault();
+//    $(this).parent().toggleClass("play stop");
+    $(this).closest(".footer-modulo").toggleClass("gray-bg");
+});
+/* side player */
+(function(){
+    var $sidePlayer = $("#side-player");
+
+    if ($sidePlayer.length == 0) {
+        return;
+    }
+
+    $("body").addClass("side-player side-player-closed");
+
+    var initialized = false;
+
+    $(".wrapper-side-player .toggle, header .player-toggle").click(function(event){
+        event.preventDefault();
+        $("body").toggleClass("side-player-open side-player-closed");
+        if (!initialized) {
+            window.setTimeout(function(){
+                $("#scroll-lista").tinyscrollbar();
+                $(".wrapper-side-player .player-buttons .volume.horizontal").slider();
+                $("#sortable-list").sortable();
+            }, 500);
+            initialized = true;
+        }
+    });
+
+    $(document).mouseup(function (e) {
+
+        if (jQuery(window).width() > 1200) {
+            return;
+        }
+
+        if (!$("body").hasClass("side-player-open")) {
+            return;
+        }
+
+        if (
+            !$("html").is(e.target) // click en la barra de scroll
+                && (!$sidePlayer.is(e.target) && $sidePlayer.has(e.target).length === 0)) {
+            $("body").removeClass("side-player-open").addClass("side-player-closed");
+        }
+    });
+
+    $(".wrapper-side-player .player-buttons .volume.vertical").slider();
+
+    var initialTop = $sidePlayer.position().top;
+
+    $(window).scroll(function( event ) {
+        $sidePlayer[$(window).scrollTop() > initialTop ? "addClass" : "removeClass"]("fixed");
+    });
+
+})();
+
+(function(){
+    /* filtros */
+    /*$(".filtros .dropdown>li>ul>li>a").click(function(event){
+        event.preventDefault();
+        if (!$(this).hasClass("selected")) {
+            $(this).addClass("selected");
+            $(this).closest(".filtros")
+                    .find(".active-filters ul.pull-left")
+                    .append($("<li />").append($(this).clone().data("original", this)));
+        } else {
+            var self = this;
+            $(".filtros .active-filters ul.pull-left a").filter(function(){
+                return $(this).data("original") == self;
+            }).trigger("click");
+        }
+    });*/
+    $(".filtros").on("click",".dropdown>li>ul>li>a",function(event){
+        //event.preventDefault();
+        if (!$(this).hasClass("selected")) {
+        	//HAY Q DESCOMENTARLO CUANDO SEA FULL-AJAX LA WEB
+            //$(this).addClass("selected");
+            //$(this).closest(".filtros")
+            //        .find(".active-filters ul.pull-left")
+            //        .append($("<li />").append($(this).clone().data("original", this)));
+        } else {
+            var self = this;
+            $(".filtros .active-filters ul.pull-left a").filter(function(){
+                return $(this).data("original") == self;
+            }).trigger("click");
+        }
+    });
+
+    $(document).on("click", ".filtros .active-filters ul.pull-left li a", function(event){
+        event.preventDefault();
+        var original = $(this).data("original");
+        $(original).removeClass("selected");
+        $(this).parent().remove();
+    });
+
+    $(".filtros .active-filters ul.pull-right li a").click(function(event){
+        //event.preventDefault();
+        $(".filtros .active-filters ul.pull-left li a").trigger("click");
+    });
+
+    $(".filtros .main-links a[data-target]").click(function(event){
+        event.preventDefault();
+        var target = $(this).data("target");
+
+        /* active tab */
+        if ($(this).hasClass("open")) {
+            $(this).removeClass("open");
+        } else {
+            $(this).closest(".main-links").find("a").removeClass("open");
+            $(this).addClass("open");
+        }
+
+        // active dropdown
+        if ($(target).hasClass("open")) {
+            $(target).removeClass("open");
+        } else {
+            $(this).closest(".filtros").find(".dropdown").removeClass("open");
+            $(target).addClass("open");
+        }
+
+        if (target == "#filtros-dropdown") {
+            var $activeFilters = $(this).closest(".filtros").find(".active-filters");
+            if (!$(this).hasClass("open")) {
+                if ($activeFilters.find(">.pull-left>li").length == 0) {
+                    $activeFilters.hide();
+                }
+            } else {
+                $activeFilters.show();
+            }
+        }
+    });
+})();
+
+$("a[data-toggle-content]").click(function(event){
+    event.preventDefault();
+    var target = $(this).data("toggle-content");
+    $(target).slideToggle();
+    $(this).toggleClass("toggle-open toggle-closed");
+});
+
+(function(){
+    // popover añadir listas
+    TPL_POPOVER = '<div class="popover popover-lista">' +
+        '<div class="flip-container"><div class="flipper">' +
+        '<div class="popover-content"></div>' +
+        '</div></div></div>';
+
+    var scrollBarListTemplate = '<div class="tiny-scrollbar">'+
+        '<div class="scrollbar"><div class="track"><div class="thumb"><div class="end"></div></div></div></div>'+
+        '<div class="viewport"><div class="overview"></div></div>'+
+        '</div>';
+
+    var buttonsTemplate =
+        '<ul class="buttons">' +
+            '<li class="new-list"><a href="#" data-toggle-modulo=".create-new-list">Nueva lista</a></li>'+
+            '<li class="existing-list"><a href="#" data-toggle-modulo=".add-existing-list">A lista existente</a></li>'+
+            '<li class="favorites"><a href="#" data-toggle-modulo=".show-message">A mis favoritos</a></li>'+
+            '<li class="listen-later"><a href="#" data-toggle-modulo=".show-message">Escuchar más tarde</a></li>'+
+            '<li class="queue"><a href="#" data-toggle-modulo=".show-message">Cola de reproducción</a></li>' +
+        '</ul>';
+
+    var htmlTemplate =
+        '<div><div class="front"><div class="arrow"></div>' +buttonsTemplate+'</div>'+
+            '<div class="back">'+
+                '<div class="arrow"></div>' +
+                '<div class="create-new-list togglable modulo-view-default">' +
+
+                    '<div class="header-modulo">'+
+                    '<h4 class="volver"><a href="#">Volver</a></h4>'+
+                    '<span class="close"></span>'+
+                    '</div>'+
+                    '<div class="content">'+
+                    '<form>'+
+                    '<div class="form-group">'+
+                    '<input type="text" class="form-control" placeholder="Escribir nombre de nueva lista"/>'+
+                    '</div>'+
+                    '<div class="form-group">'+
+                    '<button class="btn btn-default btn-block">CREAR NUEVA LISTA</button>'+
+                    '</div>'+
+                    '</form>'+
+                    '</div>'+
+
+                '</div>' +
+                '<div class="add-existing-list togglable modulo-view-default">'+
+                    '<div class="header-modulo">'+
+                    '<h4 class="volver"><a href="#">Volver</a></h4>'+
+                    '<span class="close"></span>'+
+                    '</div>'+
+                    '<div class="content">'+scrollBarListTemplate+'</div>'+
+                    '<div class="success-msg togglable"><span>Se ha añadido correctamente</span></div>' +
+                '</div>'+
+                '<div class="show-message togglable modulo-view-default">'+
+                    '<div class="header-modulo">'+
+                    '<h4 class="volver"><a href="#">Volver</a></h4>'+
+                    '<span class="close"></span>'+
+                    '</div>'+
+                    '<div class="content"><span>Se ha añadido correctamente</span></div>'+
+                '</div>'+
+
+            '</div>' +
+        '</div>';
+
+    var hideAllPopovers = function(exclude) {
+        $('.table-list .btn.plus, .popover-plus').filter(function() {return this != exclude;}).each(function() {
+            $(this).popover('hide');
+        });
+        $('.popover-lista .flip-container.hover').removeClass("hover");
+    };
+
+    $('.table-list .btn.plus').popover({
+        placement: $(this).data('placement'),
+        content: function(){
+            var url = $(this).attr('href');
+            var tpl = $.ajax({url: url, async: false}).responseText;
+            //console.log('URL: ' + url);
+            //console.log('TPL', tpl);
+            return tpl;
+        },
+        trigger: 'manual',
+        html: true,
+        template: TPL_POPOVER
+        }).click(function(event){
+            event.preventDefault();
+            hideAllPopovers(this);
+            $(this).popover('toggle');
+    });
+
+
+   $(".popover-plus").click(function(e){
+       e.preventDefault();
+
+       var $this = $(this),
+            url  = $this.attr('href'),
+            placement = ($this.data('placement') ? $this.data('placement') : 'right');
+
+       $.ajax({
+          url: url,
+          success: function(resp){
+              $('.popover-plus').popover('destroy');
+              $this.popover({
+                  placement: placement,
+                  template: TPL_POPOVER,
+                  content: resp,
+                  trigger:'manual',
+                  html: true
+              });
+
+              $this.popover('show');
+          }
+       });
+   });
+    /*$('.table-list .btn.plus, .popover-plus').popover({
+        placement: 'auto right',
+        template: TPL_POPOVER
+
+});
+    */
+    $(".episode-list li>.content a.plus.popover-plus").click(function(){
+        var $parentPush = $(this).closest(".content-push");
+        $(".episode-list li>.content .content-push.active").not($parentPush).removeClass("active");
+        var isActive = $parentPush.toggleClass("active").hasClass("active");
+        if (!isActive) {
+            $(this).popover("hide");
+        }
+    });
+
+    var showMsg = function($popover) {
+        var $successMsg = $popover.find(".success-msg").slideDown();
+        window.setTimeout(function(){
+                $popover.popover("hide");
+        }, 2000);
+    };
+
+    $(document).on("submit", ".popover-lista .create-new-list form",
+        function(event){
+            event.preventDefault()
+            var $popover = $(this).closest(".popover-lista");
+            showMsg($popover);
+        });
+
+    function loadList($popover) {
+        // cargar esto por ajax
+        var html = "<ul><li><a href='#'>List 1</a></li><li><a href='#'>List 1</a></li><li><a href='#'>List 1</a></li>" +
+            "<li><a href='#'>List 1</a></li><li><a href='#'>List 1</a></li><li><a href='#'>List 1</a></li>" +
+            "<li><a href='#'>List 1</a></li><li><a href='#'>List 1</a></li><li><a href='#'>List 1</a></li></ul>";
+        $popover.find(".add-existing-list .overview").html(html);
+        window.setTimeout(function(){
+            $popover.find(".add-existing-list .tiny-scrollbar").tinyscrollbar();
+        }, 500);
+    }
+
+    $(document).on("click", ".popover-lista .buttons>li>a",
+        function(event){
+            event.preventDefault();
+            var $popover = $(this).closest(".popover-lista");
+            $(this).closest(".flip-container").addClass("hover");
+            $popover.find(".togglable").hide();
+            var $target = $popover.find($(this).data("toggle-modulo"));
+            $target.show();
+
+            if($target.hasClass("add-existing-list")) {
+                loadList($popover)
+            }
+        });
+})();
+
+/*(function(){
+    var template = '<div class="popover" role="tooltip"><div class="arrow"></div>' +
+        '<a href="#" class="popover-close"></a><h3 class="popover-title"></h3>' +
+        '<div class="popover-content"></div></div>';
+
+    $('.popover-data').each(function(){
+        var popoverContent = $(this).data("popover-content");
+        $(this).popover({
+            content: popoverData[popoverContent]["content"],
+            title: popoverData[popoverContent]["title"],
+            template: template,
+            container: 'body',
+            html: true,
+            trigger: 'click',
+            placement:'bottom'
+        });
+    });
+})();*/
+
+/*(function(){
+    // ** popover eliminar suscripcion **
+    var template = '<div class="popover popover-remove" role="tooltip"><div class="arrow"></div>' +
+        '<div class="popover-content"></div></div>';
+
+    var baseContent = "<span>¿Quieres eliminar la suscripción?</span>"+
+        "<div><a href='#' class='btn btn-primary popover-button-close'>CANCELAR</a> " +
+        "<a href='#' class='btn btn-default'>ELIMINAR</a></div>";
+
+    $('.modulo-view .header-modulo .remove, .table-list .remove').each(function(){
+
+        var content = baseContent;
+        if($(this).data("info-txt")) {
+            content = "<div class='info-txt'>"+$(this).data("info-txt")+"</div>"+baseContent;
+        }
+
+        $(this).popover({
+            content: content,
+            template: template,
+            container: 'body',
+            html: true,
+            trigger: 'focus',
+            placement:'bottom'
+        });
+    });
+})();*/
+
+$(document).on('click', '.popover-close, .popover-button-close', function(event){
+    event.preventDefault();
+    $(this).closest(".popover").remove();
+});
+/*
+$("a.trigger-file-upload[data-file-input]").click(function(event){
+    event.preventDefault();
+    $($(this).data("file-input")).click();
+});
+
+$("input.upload-imagen").change(function(event) {
+    var files = this.files;
+    if (files && files[0]) {
+        var reader = new FileReader();
+        var inputId = $(this).attr("id");
+        var target = "#"+inputId+"-placeholder";
+        var uploadBar = "#"+inputId+"-bar";
+        reader.onload = function (e) {
+            $(uploadBar).addClass("uploaded-image").text(files[0].name)
+                .append($('<a />').addClass("remove-uploaded-image").data("input-id", inputId));
+            $(target).attr("src", e.target.result);
+        }
+
+        reader.readAsDataURL(files[0]);
+    }
+});
+*/
+$(document).on("click", ".uploaded-image a", function() {
+    var img = $("#"+$(this).data("input-id")+"-placeholder");
+    $(img).attr("src", $(img).data("img"));
+    $(this).parent().empty().removeClass("uploaded-image");
+});
+
+$(".switch-licence a").click(function(event) {
+    event.preventDefault();
+    $(this).parent().addClass("hide").next().removeClass("hide");
+});
+
+/*(function(){
+    //* popover categoria / etiquetas
+
+    $(document).on("click", "#popover-categoria-input, #popover-etiquetas-input+.bootstrap-tagsinput input", function(){
+        console.log("click1");
+        console.log($(this));
+        //Validación del campo cuando se cierra el modal con el icono
+        var opened = $(this).next().attr('data-opened');
+        var status = (opened == 1) ? 0 : 1;
+
+        if(opened == 1) $($(this).data("target")).valid();
+        $(this).next().attr('data-opened', status);
+
+
+        if (!$(this).data("popover-initialized")) {
+            var isPopoverEtiquetas = $(this).attr("id") != "popover-categoria-input";
+            var content =  $(isPopoverEtiquetas ? "#popover-etiquetas" : "#popover-categoria").html();
+
+            if(isPopoverEtiquetas) {
+                $("#popover-etiquetas-input").tagsinput('input').data("container", ".container-popover-selector");
+            }
+
+            var container = $(this).data("container") || "body";
+            var template = '<div class="popover popover-categoria '+(isPopoverEtiquetas ? "popover-etiquetas" : "")+'" role="tooltip"><div class="arrow"></div>' +
+            '<a href="#" class="popover-close"></a><div class="popover-content"></div></div>';
+            $(this).popover({
+                content: content,
+                template: template,
+                container: container,
+                html: true,
+                trigger: 'manual',
+                placement:'bottom'
+            });
+
+            $(this).data("popover-initialized", 1);
+        }
+
+
+
+        //$(this).popover("toggle");
+        $(this).popover("show");
+    });
+
+    $(document).on("click", "#popover-categoria-input+i.categoria-icon, .bootstrap-tagsinput+i.etiquetas-icon", function(){
+        console.log("click2");
+        var target = $(this).hasClass("categoria-icon")
+                        ? "#popover-categoria-input"
+                        : "#popover-etiquetas-input+.bootstrap-tagsinput input";
+
+        $(target).click();
+    });
+
+*/
+    /*$(document).on("click", ".popover-categoria input", function(){
+        var target = $(this).closest(".popover-categoria").hasClass("popover-etiquetas") ? "etiquetas" : "categoria";
+        if(target == 'categoria') $('#subcategories').val($(this).val());
+        $("#popover-"+target+"-input").val($(this).parent().text().trim());
+        $("#popover-"+target+"-input").valid();
+    });*/
+
+    /*$(document).on("click", ".popover-categoria a[class!='popover-close']", function(event){
+        event.preventDefault();
+        var target = $(this).closest(".popover-categoria").hasClass("popover-etiquetas") ? "etiquetas" : "categoria";
+        $("#popover-"+target+"-input").val($(this).text().trim());
+    });*/
+    /*
+})();
+*/
+
+$("select").not('.notChosen').chosen({disable_search:true, inherit_select_classes:true, width: 'auto'}).change(function(){
+        $(this).valid();
+});
+
+$(".border-box a.close").click(function(event){
+    event.preventDefault();
+    $(this).closest(".border-box").slideUp();
+});
+
+
+// *** Buscador  *****************************************************
+var baseurl = $('.searchbar').data('baseurl');
+
+function doSearch(words, mainItem) {
+    var searchWords = words;
+    var searchParameters = searchWords;
+    if (searchWords === undefined) {
+        return false;
+    }
+    if (searchWords.length === 0) {
+        return false;
+    }
+    searchWords = searchWords.replace(/ /g,"-");
+    searchWords = searchWords.replace(/\//g,"-");
+    searchWords = searchWords.replace("_","-");
+    searchWords = searchWords.replace("?","");
+    searchWords = searchWords.replace("#","");
+    searchWords = searchWords.replace(/%/g,"");
+    //words = words.replace(/\'/g,"\"");
+    searchParameters = searchParameters.replace(/ /g,"+");
+    searchParameters = searchParameters.replace(/\//g,"+");
+    searchParameters = searchParameters.replace("_","+");
+    searchParameters = searchParameters.replace("#","");
+    searchParameters = searchParameters.replace("?","");
+
+    document.location= baseurl + searchWords + '_sb.html?sb=' + searchParameters;
+}
+
+function doTopSearch() {
+    var words = $('.words-top').val();
+    var mainItem = $(this).attr('data-main-item');
+    doSearch(words, mainItem);
+    return false;
+}
+
+$('.words-top').keypress(function (e) {
+    if(e.which == 13) {
+        doTopSearch();
+        return false;
+    }
+});
+
+$('#searchb').click(function () {
+    doTopSearch();
+    return false;
+});
+
+$('#buscador').submit(function(){
+    doTopSearch();
+    return false;
+});
+
+function doBodySearch() {
+    var words;
+    words = $('.words-body').val();
+    doSearch(words, 'AUDIO');
+    return false;
+}
+
+$('.words-body').keypress(function (e) {
+    if(e.which ==13) {
+        doBodySearch();
+        return false;
+    }
+});
+
+$('#buscador-body-button').click(function(){
+    doBodySearch();
+    return false;
+});
+
+$('#buscador-body').submit(function(){
+    doBodySearch();
+    return false;
+});
+
+$(".buscador-form").submit(function(){
+
+    return false;
+    if (hasPressedArrowUpDown){
+        if(menuitemSelection!=null){
+            var go_to = $(".suggestionsList li").eq(menuitemSelection).children().attr("href");
+            document.location = go_to;
+            return false;
+        }
+    }
+    else{
+        //Submit
+        var words;
+        words = $(".words").val();
+        var main_item  = $("#searchb").attr('data-main-item');
+
+        if (words.length == 0) {
+           return false;
+        }
+
+        words = words.replace(/ /g,"-");
+        words = words.replace(/\//g,"-");
+        words = words.replace("_","-");
+        words = words.replace("?","");
+        words = words.replace("#","");
+        words = words.replace(/%/g,"");
+
+        var parametre;
+        parametre = $(".words").val().replace(/ /g,"+");
+        parametre = parametre.replace(/\//g,"+");
+        parametre = parametre.replace("_","+");
+        parametre = parametre.replace("#","");
+        parametre = parametre.replace("?","");
+
+        if(main_item == 'AUDIO')
+            document.location= baseurl + words + '_sb.html?sb='+parametre;
+        else
+            document.location= baseurl + words + '_sw_1_1.html?sb='+parametre;
+        return false;
+    }
+
+});
+
+var hasFocus=false;
+function lookup(inputString) {
+    if(inputString.length == 0) {
+        // Hide the suggestion box.
+        $('.suggestions').hide();
+    } else {
+
+        inputString = inputString.replace(baseurl,"");
+        inputString = inputString.replace("#","");
+        inputString = inputString.replace(new RegExp('\\?', 'g'),"");
+        inputString = inputString.replace("http://","");
+        inputString = replaceAll(inputString,"/","");
+        inputString = inputString.replace(".","");
+        inputString = inputString.replace("www.ivoox.com","");
+
+        $.get("suggest_sz_"+inputString+"_1.html", {queryString: ""+inputString+""}, function(data){
+            if(data.length >0) {
+                $('.suggestions').show();
+                $('.suggestionsList').html(data);
+            }
+        });
+    }
+} // lookup
+
+
+function replaceAll( text, busca, reemplaza ){
+    while (text.toString().indexOf(busca) != -1)
+        text = text.toString().replace(busca,reemplaza);
+    return text;
+}
+
+var hasPressedArrowUpDown = false;
+
+var searchbarInputTimer = 0;
+var searchbarInputValue = "";
+
+setInterval(function(){
+    if (searchbarInputTimer > 0) {
+        searchbarInputTimer--;
+        if (searchbarInputTimer === 0) {
+            lookup(searchbarInputValue);
+        }
+    }
+}, 100);
+
+$(document).ready(function() {
+
+	$('form.searchbar-form').keyup(function(e) {
+        switch(e.keyCode) {
+            case 27:
+                $('.suggestions').hide();
+                break;
+            case 13:
+                $("#buscador").submit();
+                break;
+            default:
+                searchbarInputValue = $(this).find('.searchbar-input').val();
+                searchbarInputTimer = 5; // ms to send query to server
+                break;
+        }
+    });
+
+});
+
+function setCookie(name, value, duration, path, domain){
+    if(!name) return false;
+
+    var duration    = (duration) ? duration : 31536000,
+        expires     = new Date(new Date().getTime() + duration),
+        mypath      = (mypath) ? mypath : '/',
+        mydomain    = (mydomain) ?  mydomain : '.ivoox.com';
+
+    document.cookie = name + '=' + value + '; ' +
+                      'expires=' + expires + '; ' +
+                      'max-age=' + duration + '; ' +
+                      'path='    + mypath + '; ' ;
+                      'domain='  + domain + ';';
+
+    window.location = '';
+}
+
+function submitFormNewList (frm){
+    var list_title      = $(frm).children().children('input').val();
+    var list_description= $(frm).children().children('textarea').val();
+    var list_audio      = $(frm).data('id');
+    var url             = $(frm).data('url');
+    var list_imgfile    = $(frm).data('img');
+    var list_private    = $(frm).children('#lprv').children('select').val();
+    var list_collaborative = $(frm).children('#lclb').children('select').val();
+
+    if (list_title){
+        common.ajax.doRequest(url, {list_title: list_title, list_description: list_description, list_audio: list_audio, list_imgfile: list_imgfile, list_private: list_private, list_collaborative: list_collaborative},
+            function(response) {
+
+            },
+            function(response) {
+        });
+        $('#volver_nl_'+list_audio).trigger('click');
+    }
+    else{
+        $(frm).children().children('input').parent().addClass('has-error');
+    }
+}
+
+function isFlashAvalaible (){
+	hasFlash = function(a,b){
+		try{
+			a=new ActiveXObject(a+b+'.'+a+b)
+		}
+		catch(e){
+			a=navigator.plugins[a+' '+b]
+		}
+		return!!a
+	}('Shockwave','Flash');
+
+	return hasFlash;
+}
