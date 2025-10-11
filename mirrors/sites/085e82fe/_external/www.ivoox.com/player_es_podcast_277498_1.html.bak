@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        
+        <style>
+            .text-center {text-align: center;}
+
+            a.icon-facebook:before {
+                width: 23px;
+                height: 23px;
+                background-position: -136px -87px;
+            }
+
+            a.icon-twitter:before {
+                width: 23px;
+                height: 23px;
+                background-position: -136px -116px;
+            }
+
+            a.icon-gplus:before {
+                width: 23px;
+                height: 23px;
+                background-position: -339px -242px;
+            }
+
+            a.icon-close:before {
+                width: 12px;
+                height: 12px;
+                background-position: -157px -60px;
+                position: absolute;
+            }
+
+            a:before, span:before, .button .play:before {
+                content: "";
+                background: transparent url(https://static-1.ivoox.com/images/sprites2.png) no-repeat 0 0;
+                float: left;
+                margin-right: 10px;
+            }
+        </style>
+        
+		<link href="https://static-1.ivoox.com/v2/css/embeded/embed_playlist_v2.css?1759908303" rel="stylesheet" type='text/css'>
+		<link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="https://static-1.ivoox.com/v2/js/bootstrap/bootstrap.min.js?1759908303"></script>
+        <script type="text/javascript" src="https://static-1.ivoox.com/v2/js/embeded/jquery.jplayer.min.js"></script>
+        <script src="https://static-1.ivoox.com/v2/js/component.js?1759908303" filename="component"></script>
+        <script src="https://static-1.ivoox.com/v2/js/chosen/chosen.jquery.min.js?1759908303"></script>
+        <script src="https://static-1.ivoox.com/v2/js/jQTinyScrollbar/jquery.tinyscrollbar.js?1759908303"></script>
+        <script src="https://static-1.ivoox.com/v2/js/ivx-generic.js?1759908303"></script>
+        <script src="https://static-1.ivoox.com/v2/js/scripts.js?1759908303"></script>
+
+                    <script type="text/javascript" src="https://static-1.ivoox.com/v2/js/embedga.js"></script>
+        
+        <script type="text/javascript">
+
+    function Cookie(){
+
+    
+        this.getCookie      = function(cname) {
+                                var name = cname + "=";
+                                var ca = document.cookie.split(';');
+                                for(var i = 0; i < ca.length; i++) {
+                                    var c = ca[i];
+                                    while (c.charAt(0) == ' ') {
+                                        c = c.substring(1);
+                                    }
+                                    if (c.indexOf(name) == 0) {
+                                        return JSON.parse(c.substring(name.length, c.length));
+                                    }
+                                }
+                                return "";
+                            }
+
+        this.setCookie      = function(cname, cvalue, exdays) {
+
+                                var d = new Date();
+                                var expires = "";
+                                if(exdays == 0 || exdays == undefined){
+                                    var now = new Date();
+                                    d.setFullYear(now.getFullYear());
+                                    d.setMonth(now.getMonth());
+                                    d.setDate(now.getDate());
+                                    d.setHours(23);
+                                    d.setMinutes(59);
+                                    d.setSeconds(59);
+                                }else{
+                                    d.setDate(d.getDate() + exdays);
+                                }
+                                expires = "expires="+d;
+
+                                document.cookie = cname + "=" + cvalue + ";" + expires + ";domain=ivoox.com;path=/";
+                            }
+
+        this.delCookie      = function(cname) {
+                                document.cookie = cname + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=ivoox.com; path=/;";
+                            }
+    
+    }
+
+    function Evento(){
+        this.audioId        = 0;
+        this.ts             = '';
+        this.platform       = '';
+        this.audioSession   = 0;
+        this.so             = '';
+        this.type           = '';
+        this.uId            = 0;
+        this.current        = 0;
+        this.last           = 0;
+        this.time           = 0;
+        this.continuous     = 1;
+        this.isEmbed        = true;
+
+        this.setAudioId         = function(audioId){ this.audioId = audioId; }
+        this.setTs              = function(ts){ this.ts = ts; }
+        this.setAudioSession    = function(audioSession) { this.audioSession = audioSession; }
+        this.setType            = function(type) { this.type = type; }
+        this.setUId             = function(uId) { this.uId = uId; }
+        this.setCurrent         = function(current) { this.current = current; }
+        this.setLast            = function(last) { this.last = last; }
+        this.setTime            = function(time) { this.time = time; }
+        this.setContinuous      = function(continuous) { this.continuous = continuous; }
+        this.setIsEmbed         = function(isEmbed) { this.isEmbed = isEmbed; }
+
+
+        this.getAudioId         = function() { return this.audioId; }
+        this.getTs              = function() { return this.ts}
+        this.getPlatform        = function() { return this.platform}
+        this.getAudioSession    = function() { return this.audioSession; }
+        this.getSo              = function() { return this.so }
+        this.getType            = function() { return this.type; }
+        this.getUId             = function() { return this.uId; }
+        this.getCurrent         = function() { return this.current;}
+        this.getLast            = function() { return this.last;}
+        this.getTime            = function() { return this.time;}
+        this.getContinuous      = function() { return this.continuous;}
+        this.getIsEmbed         = function() { return this.isEmbed;}
+
+
+    
+        this.setSoAndPlatform = function() {
+
+            var unknown = '-';
+
+            // browser
+            var nVer = navigator.appVersion;
+            var nAgt = navigator.userAgent;
+
+            // system
+            var os = unknown;
+            var clientStrings = [
+                {s:'Windows 10', r:/(Windows 10.0|Windows NT 10.0)/},
+                {s:'Windows 8.1', r:/(Windows 8.1|Windows NT 6.3)/},
+                {s:'Windows 8', r:/(Windows 8|Windows NT 6.2)/},
+                {s:'Windows 7', r:/(Windows 7|Windows NT 6.1)/},
+                {s:'Windows Vista', r:/Windows NT 6.0/},
+                {s:'Windows Server 2003', r:/Windows NT 5.2/},
+                {s:'Windows XP', r:/(Windows NT 5.1|Windows XP)/},
+                {s:'Windows 2000', r:/(Windows NT 5.0|Windows 2000)/},
+                {s:'Windows ME', r:/(Win 9x 4.90|Windows ME)/},
+                {s:'Windows 98', r:/(Windows 98|Win98)/},
+                {s:'Windows 95', r:/(Windows 95|Win95|Windows_95)/},
+                {s:'Windows NT 4.0', r:/(Windows NT 4.0|WinNT4.0|WinNT|Windows NT)/},
+                {s:'Windows CE', r:/Windows CE/},
+                {s:'Windows 3.11', r:/Win16/},
+                {s:'Android', r:/Android/},
+                {s:'Open BSD', r:/OpenBSD/},
+                {s:'Sun OS', r:/SunOS/},
+                {s:'Linux', r:/(Linux|X11)/},
+                {s:'iOS', r:/(iPhone|iPad|iPod)/},
+                {s:'Mac OS X', r:/Mac OS X/},
+                {s:'Mac OS', r:/(MacPPC|MacIntel|Mac_PowerPC|Macintosh)/},
+                {s:'QNX', r:/QNX/},
+                {s:'UNIX', r:/UNIX/},
+                {s:'BeOS', r:/BeOS/},
+                {s:'OS/2', r:/OS\/2/},
+                {s:'Search Bot', r:/(nuhk|Googlebot|Yammybot|Openbot|Slurp|MSNBot|Ask Jeeves\/Teoma|ia_archiver)/}
+            ];
+            for (var id in clientStrings) {
+                var cs = clientStrings[id];
+                if (cs.r.test(nAgt)) {
+                    os = cs.s;
+                    break;
+                }
+            }
+
+            var osVersion = unknown;
+
+            if (/Windows/.test(os)) {
+                osVersion = /Windows (.*)/.exec(os)[1];
+                os = 'Windows';
+            }
+
+            switch (os) {
+                case 'Mac OS X':
+                    osVersion = /Mac OS X (10[\.\_\d]+)/.exec(nAgt)[1];
+                    break;
+
+                case 'Android':
+                    osVersion = /Android ([\.\_\d]+)/.exec(nAgt)[1];
+                    break;
+
+                case 'iOS':
+                    osVersion = /OS (\d+)_(\d+)_?(\d+)?/.exec(nVer);
+                    osVersion = osVersion[1] + '.' + osVersion[2] + '.' + (osVersion[3] | 0);
+                    break;
+            }
+
+            this.so = os + ' ' + osVersion;
+            this.platform = os;
+        }
+    
+    }
+
+
+    function setDownloadAudioEvent(audioId){
+        console.log('START_DOWNLOAD');
+        var evento = new Evento();
+        evento.setAudioId(audioId);
+        evento.setTs(Math.round(new Date().getTime()/1000));
+        evento.setAudioSession(evento.getAudioId()+''+evento.getTs()+''+userId);
+        evento.setSoAndPlatform();
+        evento.setUId(userId);
+        evento.setTs(Math.round(new Date().getTime()/1000));
+        evento.setType('START_DOWNLOAD');
+
+        $.ajax({
+            url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&format=json&web=true",
+            type: "GET",
+            jsonp: 'callback',
+            dataType: 'jsonp',
+            contentType: 'application/json'
+        }).done(function(e){
+        }).fail(function(e){
+        });
+    }
+
+    function setAudioSessionIdCookie(evento,timestamp,timeExpirationSession){
+
+        var cookie = new Cookie();
+
+        var audioSessionCookie = cookie.getCookie('audioSession');
+        if(audioSessionCookie == ""){
+            if(_DEBUG) console.log('CREO COOKIE NEW');
+            var audioSession;
+            audioSession = {audioSessionId: evento.getAudioId()+''+evento.getTs()+''+evento.getUId(), timestamp: evento.getTs(), audioId: evento.getAudioId() };
+            cookie.setCookie('audioSession',JSON.stringify(audioSession),0);
+        }else{
+
+            if(audioSessionCookie.audioId == evento.getAudioId()){
+                //now <= timestamp + 1800
+                if( timestamp > ( audioSessionCookie.timestamp + timeExpirationSession )){
+                    if(_DEBUG)  console.log('ENTRO COOKIE UPDATE AND SET NEW SESSION');
+                    //seteo de nuevo la cookie
+                    evento.setTs(timestamp);
+                    audioSessionCookie = {audioSessionId: evento.getAudioId()+''+evento.getTs()+''+evento.getUId(), timestamp: evento.getTs(),audioId: evento.getAudioId() };
+                    cookie.setCookie('audioSession',JSON.stringify(audioSessionCookie),0);
+                    //creo evento
+                    evento.setAudioSession(evento.getAudioId()+''+evento.getTs()+''+evento.getUId());
+                }else{
+                    if(_DEBUG)  console.log('ENTRO COOKIE UPDATE');
+                    audioSessionCookie = {audioSessionId: audioSessionCookie.audioSessionId, timestamp: timestamp,audioId: evento.getAudioId()};
+                    cookie.setCookie('audioSession',JSON.stringify(audioSessionCookie),0);
+                    evento.setTs(timestamp);
+                    evento.setAudioSession(audioSessionCookie.audioSessionId);
+                }
+            }else{
+                if(_DEBUG) console.log('CAMBIO LA COOKIE');
+                var audioSession;
+                audioSession = {audioSessionId: audioSessionCookie.audioId+''+evento.getTs()+''+evento.getUId(), timestamp: evento.getTs(), audioId: audioSessionCookie.audioId };
+                cookie.setCookie('audioSession',JSON.stringify(audioSession),0);
+            }
+        }
+    }
+
+
+    function launchPartialListen(interval){
+        if (interval !== undefined && interval.id !== undefined){
+            if(_DEBUG) console.log ( "CLEARING INTERVAL id: " + interval.id);
+            clearInterval(interval.id);
+        }
+        if (evento !== undefined){
+            evento.setCurrent(0);
+        }
+
+        iId = setInterval(function() {
+            psts = $("#jquery_jplayer_1").data("jPlayer").status;
+            if (!psts.paused) {
+                if(_DEBUG) console.log ( "PARTIAL_LISTEN");
+
+                var timestampIntervalFourtySec = Math.round(new Date().getTime()/1000);
+                evento.setTs(timestampIntervalFourtySec);
+                evento.setType('PARTIAL_LISTEN');
+                evento.setLast(evento.getCurrent());
+                evento.setCurrent(Math.floor(psts.currentTime));
+                evento.setTime(timer);
+
+                $.ajax({
+                    url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&current="+evento.getCurrent()+"&last="+evento.getLast()+"&time="+evento.getTime()+"&continuous="+evento.getContinuous()+"&format=json&web=true&emb=true",
+                    type: "GET",
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    contentType: 'application/json'
+                }).done(function(e){
+                }).fail(function(e){
+                });
+
+                evento.setContinuous(1);
+
+                //cambiamos el timestamp de la cookie
+                audioSession = {audioSessionId: evento.getAudioSession(), timestamp: evento.getTs(), audioId: evento.getAudioId() };
+                cookie.setCookie('audioSession',JSON.stringify(audioSession),0);
+
+            }
+        }, 40000);
+
+        if (interval !== undefined && interval.id !== undefined){ 
+            interval.id = iId;
+            if(_DEBUG) console.log ( "SETED INTERVAL id: " + interval.id);
+        }
+
+    }
+
+</script>
+
+		<script type="text/javascript">
+            var _DEBUG =  false ;
+            if(_DEBUG) console.log('DEBUG: [ENABLED]');
+            
+            var cookie          = new Cookie();
+            var evento          = new Evento();
+            var userId          = "35797206994146799051";
+            var timer           = 0;
+            var timerInactivity = 0;
+            var id              = 54532944;
+            var audio_duration  = '29:51';
+            var started_listen  = false;
+            var timeExpirationSession = 1800;
+            var timestamp       = 0;
+            var apiDomain       = "https://api.ivoox.com";
+            var interval40s     = { id : null };
+            var playEventInfo   = {};
+            
+		    var id=54532944;
+		    var play1=false;
+		    var currentPosition = 0;
+		    var countRetry = 0;
+            var type= "mp3";
+		    			var audios = [{"title":"Espa&ntilde;a y los Reyes Cat&oacute;licos. Alberto Barcena, profesor de historia y doctrina social de la Iglesia de la San Pablo CEU.","titleRaw":"Espa\u00f1a y los Reyes Cat\u00f3licos. Alberto Barcena, profesor de historia y doctrina social de la Iglesia de la San Pablo CEU.","shorttitle":"Espa&ntilde;a y los Reyes Cat&oacute;licos. Alberto Bar...","id":"54532944","user":null,"duration":"29:51","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"0\/9\/8\/4\/4231596014890","img":"0\/9\/8\/4\/4231596014890","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/0\/9\/8\/4\/4231596014890_LG.jpg","paid":"0"},{"title":"Consensuar una nueva Ley Educativa. Carlos Conde Solares, coordinador del Foro de Profesores (@foroprofesores).","titleRaw":"Consensuar una nueva Ley Educativa. Carlos Conde Solares, coordinador del Foro de Profesores (@foroprofesores).","shorttitle":"Consensuar una nueva Ley Educativa. Carlos Conde Solare...","id":"54532903","user":null,"duration":"30:00","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"6\/2\/7\/4\/8501596014726","img":"6\/2\/7\/4\/8501596014726","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/6\/2\/7\/4\/8501596014726_LG.jpg","paid":"0"},{"title":"Cambiar la Ley Electoral. Lorenzo Abad&iacute;a, empresario, analista pol&iacute;tico y promotor de la Campa&ntilde;a #OtraLeyElectoral.","titleRaw":"Cambiar la Ley Electoral. Lorenzo Abad\u00eda, empresario, analista pol\u00edtico y promotor de la Campa\u00f1a #OtraLeyElectoral.","shorttitle":"Cambiar la Ley Electoral. Lorenzo Abad&iacute;a, empres...","id":"54532826","user":null,"duration":"29:58","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"5\/5\/5\/4\/6381596014555","img":"5\/5\/5\/4\/6381596014555","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/5\/5\/5\/4\/6381596014555_LG.jpg","paid":"0"},{"title":"La entrevista de Hendaya. Rafael Rodrigo (@kappo250), Doctor en Historia contempor&aacute;nea.","titleRaw":"La entrevista de Hendaya. Rafael Rodrigo (@kappo250), Doctor en Historia contempor\u00e1nea.","shorttitle":"La entrevista de Hendaya. Rafael Rodrigo (@kappo250), D...","id":"54229583","user":null,"duration":"30:10","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"9\/6\/8\/0\/911595410869","img":"9\/6\/8\/0\/911595410869","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/9\/6\/8\/0\/911595410869_LG.jpg","paid":"0"},{"title":"El pensamiento progresista. Juan Carlos Jimenez, catedr&aacute;tico de Historia del Pensamiento Universidad CEU San Pablo.","titleRaw":"El pensamiento progresista. Juan Carlos Jimenez, catedr\u00e1tico de Historia del Pensamiento Universidad CEU San Pablo.","shorttitle":"El pensamiento progresista. Juan Carlos Jimenez, catedr...","id":"54229173","user":null,"duration":"29:45","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"0\/5\/4\/0\/5011595410450","img":"0\/5\/4\/0\/5011595410450","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/0\/5\/4\/0\/5011595410450_LG.jpg","paid":"0"},{"title":"El Estado Liberal. Carlos Gregorio Hern&aacute;ndez (@carlosghh), profesor de Historia Contempor&aacute;nea Universidad CEU San Pablo.","titleRaw":"El Estado Liberal. Carlos Gregorio Hern\u00e1ndez (@carlosghh), profesor de Historia Contempor\u00e1nea Universidad CEU San Pablo.","shorttitle":"El Estado Liberal. Carlos Gregorio Hern&aacute;ndez (@c...","id":"54228955","user":null,"duration":"31:35","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"6\/4\/0\/0\/2531595410046","img":"6\/4\/0\/0\/2531595410046","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/6\/4\/0\/0\/2531595410046_LG.jpg","paid":"0"},{"title":"Algo de historia de la econom&iacute;a espa&ntilde;ola. Javier Morillas (javierbarcabo), catedr&aacute;tico de econom&iacute;a aplicada.","titleRaw":"Algo de historia de la econom\u00eda espa\u00f1ola. Javier Morillas (javierbarcabo), catedr\u00e1tico de econom\u00eda aplicada.","shorttitle":"Algo de historia de la econom&iacute;a espa&ntilde;ola....","id":"53976118","user":null,"duration":"29:56","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"5\/5\/0\/2\/2271594832055","img":"5\/5\/0\/2\/2271594832055","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/5\/5\/0\/2\/2271594832055_LG.jpg","paid":"0"},{"title":"El Ej&eacute;rcito y la transici&oacute;n espa&ntilde;ola. Pablo Gonz&aacute;lez-Pola de la Granja, profesor de la Universidad San Pablo CEU","titleRaw":"El Ej\u00e9rcito y la transici\u00f3n espa\u00f1ola. Pablo Gonz\u00e1lez-Pola de la Granja, profesor de la Universidad San Pablo CEU","shorttitle":"El Ej&eacute;rcito y la transici&oacute;n espa&ntilde;o...","id":"53562407","user":null,"duration":"29:49","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"0\/7\/1\/6\/9591594286170","img":"0\/7\/1\/6\/9591594286170","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/0\/7\/1\/6\/9591594286170_LG.jpg","paid":"0"},{"title":"Educaci&oacute;n Especial. Jos&eacute; Mar&iacute;a Escudero, presidente de la Plataforma 'Educaci&oacute;n Inclusiva S&iacute;, Especial tambi&eacute;n'","titleRaw":"Educaci\u00f3n Especial. Jos\u00e9 Mar\u00eda Escudero, presidente de la Plataforma 'Educaci\u00f3n Inclusiva S\u00ed, Especial tambi\u00e9n'","shorttitle":"Educaci&oacute;n Especial. Jos&eacute; Mar&iacute;a Esc...","id":"53310399","user":null,"duration":"30:12","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"7\/3\/8\/5\/5861594065837","img":"7\/3\/8\/5\/5861594065837","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/7\/3\/8\/5\/5861594065837_LG.jpg","paid":"0"},{"title":"PSOE en la historia. Francisco Torres Garc&iacute;a, historiador, catedr&aacute;tico de secundaria,","titleRaw":"PSOE en la historia. Francisco Torres Garc\u00eda, historiador, catedr\u00e1tico de secundaria,","shorttitle":"PSOE en la historia. Francisco Torres Garc&iacute;a, hi...","id":"53152052","user":null,"duration":"29:52","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"1\/9\/7\/8\/4451593768791","img":"1\/9\/7\/8\/4451593768791","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/1\/9\/7\/8\/4451593768791_LG.jpg","paid":"0"},{"title":"No tenemos la mejor sanidad del mundo. Luis De Miguel Ortega, un enfermero con toga","titleRaw":"No tenemos la mejor sanidad del mundo. Luis De Miguel Ortega, un enfermero con toga","shorttitle":"No tenemos la mejor sanidad del mundo. Luis De Miguel O...","id":"52923375","user":null,"duration":"28:46","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"0\/9\/1\/3\/5811593463190","img":"0\/9\/1\/3\/5811593463190","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/0\/9\/1\/3\/5811593463190_LG.jpg","paid":"0"},{"title":"Escrutinio General, &iquest;cu&aacute;ndo se har&aacute;? Jos&eacute; Roberto Roca Torregrosa, presidente de DCID, impulsador de @ETransparentes.","titleRaw":"Escrutinio General, \u00bfcu\u00e1ndo se har\u00e1? Jos\u00e9 Roberto Roca Torregrosa, presidente de DCID, impulsador de @ETransparentes.","shorttitle":"Escrutinio General, &iquest;cu&aacute;ndo se har&aacute...","id":"48865821","user":null,"duration":"27:02","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"8\/8\/6\/7\/2541584087688","img":"8\/8\/6\/7\/2541584087688","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/8\/8\/6\/7\/2541584087688_LG.jpg","paid":"0"},{"title":"Alfonso XIII. Javier Garc&iacute;a-Bernal (@gbernaljavier), abogado especializado seguros y escritor de temas hist&oacute;ricos.","titleRaw":"Alfonso XIII. Javier Garc\u00eda-Bernal (@gbernaljavier), abogado especializado seguros y escritor de temas hist\u00f3ricos.","shorttitle":"Alfonso XIII. Javier Garc&iacute;a-Bernal (@gbernaljavi...","id":"48833751","user":null,"duration":"26:39","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"9\/6\/9\/4\/8161584004969","img":"9\/6\/9\/4\/8161584004969","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/9\/6\/9\/4\/8161584004969_LG.jpg","paid":"0"},{"title":"Podemos quiere espacios 'Judenfrei'. Juan Hern&aacute;ndez, Director de Comunicaci&oacute;n de ACOM (@ACOM_es)","titleRaw":"Podemos quiere espacios 'Judenfrei'. Juan Hern\u00e1ndez, Director de Comunicaci\u00f3n de ACOM (@ACOM_es)","shorttitle":"Podemos quiere espacios 'Judenfrei'. Juan Hern&aacute;n...","id":"48800688","user":null,"duration":"28:17","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"6\/8\/8\/1\/6831583921886","img":"6\/8\/8\/1\/6831583921886","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/6\/8\/8\/1\/6831583921886_LG.jpg","paid":"0"},{"title":"Feminismo e igualdad. Leonor Tamayo (@TamayoLeonor). Presidente de Women of the World (@wow_platform).","titleRaw":"Feminismo e igualdad. Leonor Tamayo (@TamayoLeonor). Presidente de Women of the World (@wow_platform).","shorttitle":"Feminismo e igualdad. Leonor Tamayo (@TamayoLeonor). Pr...","id":"48708961","user":null,"duration":"28:10","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"3\/5\/6\/4\/6101583834653","img":"3\/5\/6\/4\/6101583834653","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/3\/5\/6\/4\/6101583834653_LG.jpg","paid":"0"},{"title":"Custodia compartida. Juan Fco Solichero (@JSolichero), miembro de la ejecutiva de la Asociaci&oacute;n Aire.","titleRaw":"Custodia compartida. Juan Fco Solichero (@JSolichero), miembro de la ejecutiva de la Asociaci\u00f3n Aire.","shorttitle":"Custodia compartida. Juan Fco Solichero (@JSolichero), ...","id":"48600294","user":null,"duration":"27:00","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"4\/8\/5\/3\/5251583483584","img":"4\/8\/5\/3\/5251583483584","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/4\/8\/5\/3\/5251583483584_LG.jpg","paid":"0"},{"title":"Legado espa&ntilde;ol en EEEUU. Juan Ignacio G&uuml;enechea (@ji_guenechea); coordinador de The Hispanic Council (@hispaniccouncil).","titleRaw":"Legado espa\u00f1ol en EEEUU. Juan Ignacio G\u00fcenechea (@ji_guenechea); coordinador de The Hispanic Council (@hispaniccouncil).","shorttitle":"Legado espa&ntilde;ol en EEEUU. Juan Ignacio G&uuml;ene...","id":"48552174","user":null,"duration":"26:37","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"1\/8\/3\/0\/8701583400381","img":"1\/8\/3\/0\/8701583400381","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-2.ivoox.com\/audios\/1\/8\/3\/0\/8701583400381_LG.jpg","paid":"0"},{"title":"Antifeminista y antimachista. Mar&iacute;a Godoy, licenciada en Historia y escritora.","titleRaw":"Antifeminista y antimachista. Mar\u00eda Godoy, licenciada en Historia y escritora.","shorttitle":"Antifeminista y antimachista. Mar&iacute;a Godoy, licen...","id":"48495010","user":null,"duration":"25:39","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"0\/7\/4\/6\/701583316470","img":"0\/7\/4\/6\/701583316470","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/0\/7\/4\/6\/701583316470_LG.jpg","paid":"0"},{"title":"Covid-19: higiene y tranquilidad. Dr. Justo Men&eacute;ndez, jefe del Dpto de Urgencias de HM Hospitales en Madrid","titleRaw":"Covid-19: higiene y tranquilidad. Dr. Justo Men\u00e9ndez, jefe del Dpto de Urgencias de HM Hospitales en Madrid","shorttitle":"Covid-19: higiene y tranquilidad. Dr. Justo Men&eacute;...","id":"48449449","user":null,"duration":"26:23","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"6\/5\/1\/0\/5561583230156","img":"6\/5\/1\/0\/5561583230156","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/6\/5\/1\/0\/5561583230156_LG.jpg","paid":"0"},{"title":"La Ciencia podr&aacute; con el coronavirus. Rafael Delgado Jefe de Servicio de Microbiolog&iacute;a Hospital 12 de Octubre.","titleRaw":"La Ciencia podr\u00e1 con el coronavirus. Rafael Delgado Jefe de Servicio de Microbiolog\u00eda Hospital 12 de Octubre.","shorttitle":"La Ciencia podr&aacute; con el coronavirus. Rafael Delg...","id":"48321731","user":null,"duration":"27:10","numrecomends":null,"numcomments":null,"format":null,"programId":"277498","imgfile":"8\/9\/5\/6\/4691582876598","img":"8\/9\/5\/6\/4691582876598","programa":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"program":{"id":"277498","name":"A Fondo","description":"Conversaci\u00f3n tranquila de Josep Maria Franc\u00e0s con un protagonista de la actualidad en Radio Intereconom\u00eda, programa 'A Fondo' de lunes a jueves de 0,30 a 1,30 de la madrugada.","feed":"478","canal":"197466","channel":null,"url":"a-fondo","img":"comunidad","img_version":null,"img_header":null,"category":"7","subcategory":"31","relationpriority":"SUBCATEGORY","numaudiosfeed":"20","bo_revised":"0","revenueshare":"0","rs_start":null,"rs_type":"NONE","rs_premiere_hours":"0","rs_ad":null,"user":"4349155","adsfree":"0","gender":"5","language":"1","itunestype":"episodic","appleFeedClaimToken":null,"exclusive":null,"exclusive_auto_preview":"0","exclusive_historic_preview":"0","idItunesCategoryRss":null,"hasFans":"0","skill_advanced_stats":"0","skill_over_two_hours":"0","skill_scheduled_publish":"0","skill_hide_stats":"0","skill_visibility":"0","skill_feed_to_itunes":"0","skill_hide_audios":"0","skill_select_rss_lenght":"0","skill_revenueshare":"0","featuredContent":null,"generateInfiniteFeedFile":0,"quality":"","position":null,"diff":null,"change":null,"numsuscriptions":"527","test":"0","licenseExpiration":null,"explicit":"0","collaboration":"1","commentpolicity":"2","donation":"0","hide_ranking":"0","hide_listening":"0","hide_feeds":"0","hide_likes":"0","public_email":null,"uploaddate":"29\/07\/2020","uploadDate":"+1","dateUnit":"a\u00f1o","mysqldate":"2020-07-29 11:28:16","numaudios":"480","download":"ALL","directDownload":0},"imgsrc":"https:\/\/static-1.ivoox.com\/audios\/8\/9\/5\/6\/4691582876598_LG.jpg","paid":"0"}];
+			var showAds = false;
+			var G_baseurl       = "https://www.ivoox.com/";
+
+			window.getCookie = function(name) {
+                var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+                if (match) return match[2];
+            }
+
+		
+		    $(this).bind($.jPlayer.event.play, function() {
+                timestamp = Math.round(new Date().getTime()/1000);
+                playEventInfo = $("#jquery_jplayer_1").data("jPlayer").status;
+                if (!started_listen && !playEventInfo.paused) {
+                    if(_DEBUG) console.log("START_LISTEN");
+                    evento.setType('START_LISTEN');
+                    evento.setAudioId(audios[currentPosition].id);
+                    evento.setTs(timestamp);
+                    evento.setSoAndPlatform();
+                    evento.setUId(userId);
+                    evento.setAudioSession(evento.getAudioId()+''+evento.getTs()+''+userId);
+                    started_listen = true;
+                    launchPartialListen(interval40s);
+                }
+                else{
+                    if(_DEBUG) console.log("RESUME_LISTEN");
+                    evento.setType('RESUME_LISTEN');
+                    evento.setTs(timestamp);
+                }
+
+                setAudioSessionIdCookie(evento,timestamp,timeExpirationSession);
+
+                $.ajax({
+                    url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&format=json&web=true&emb=true",
+                    type: "GET",
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    contentType: 'application/json'
+                }).done(function(e){
+                }).fail(function(e){
+                });
+
+                if(!play1){
+                    $.ajax({url: "s_me_"+id+"_1.html?source=EMBEDED", context: document.body})
+                    .done(function() {
+                        play1=true;
+                    });
+                }
+            });
+
+            $(this).bind($.jPlayer.event.pause, function(){
+                //enviando el pause
+                timestamp = Math.round(new Date().getTime()/1000);
+                evento.setTs(timestamp);
+                evento.setType('PAUSE_LISTEN');
+
+                var pauseInfo = $("#jquery_jplayer_1").data("jPlayer").status;
+
+                if(pauseInfo.ended == false){
+                    if(_DEBUG) console.log ( "PAUSE_LISTEN");
+
+                    $.ajax({
+                        url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&format=json&web=true&emb=true",
+                        type: "GET",
+                        jsonp: 'callback',
+                        dataType: 'jsonp',
+                        contentType: 'application/json'
+                    }).done(function(e){
+                    }).fail(function(e){
+                    });
+
+                    if(_DEBUG) console.log ("PARTIAL_LISTEN");
+                    psts = $("#jquery_jplayer_1").data("jPlayer").status;
+                    evento.setTs(timestamp);
+                    evento.setType('PARTIAL_LISTEN');
+                    evento.setLast(evento.getCurrent());
+                    evento.setCurrent(Math.floor(psts.currentTime));
+                    evento.setTime(timer);
+
+                    $.ajax({
+                        url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&current="+evento.getCurrent()+"&last="+evento.getLast()+"&time="+evento.getTime()+"&continuous="+evento.getContinuous()+"&format=json&web=true&emb=true",
+                        type: "GET",
+                        jsonp: 'callback',
+                        dataType: 'jsonp',
+                        contentType: 'application/json'
+                    }).done(function(e){
+                    }).fail(function(e){
+                    });
+
+                    evento.setContinuous(1);
+
+                    audioSession = {audioSessionId: evento.getAudioSession(), timestamp: evento.getTs(), audioId: evento.getAudioId() };
+                    cookie.setCookie('audioSession',JSON.stringify(audioSession),0);
+                }
+            });
+
+            $(this).bind($.jPlayer.event.seeked, function() {
+                //enviando el pause
+                if(_DEBUG) console.log ( "SEEKED_LISTEN");
+                evento.setContinuous(0);
+            });
+
+            $(this).bind($.jPlayer.event.ended, function(event) {
+                if(_DEBUG) console.log ("PARTIAL_LISTEN");
+                psts = $("#jquery_jplayer_1").data("jPlayer").status;
+                timestamp = Math.round(new Date().getTime()/1000);
+                evento.setTs(timestamp);
+                evento.setType('PARTIAL_LISTEN');
+                evento.setLast(evento.getCurrent());
+                evento.setCurrent(Math.floor(psts.duration));
+                evento.setTime(timer);
+
+                $.ajax({
+                    url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&current="+evento.getCurrent()+"&last="+evento.getLast()+"&time="+evento.getTime()+"&continuous="+evento.getContinuous()+"&format=json&web=true&emb=true",
+                    type: "GET",
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    contentType: 'application/json'
+                }).done(function(e){
+                }).fail(function(e){
+                });
+
+                if(_DEBUG) console.log("END_LISTEN");
+                evento.setTs(timestamp);
+                evento.setType('END_LISTEN');
+
+                $.ajax({
+                    url: apiDomain+"/1-1/?function=setAudioEvents&audioId="+evento.getAudioId()+"&ts="+evento.getTs()+"&platform="+evento.getPlatform()+"&audioSession="+evento.getAudioSession()+"&so="+evento.getSo()+"&type="+evento.getType()+"&uId="+evento.getUId()+"&format=json&web=true&emb=true",
+                    type: "GET",
+                    jsonp: 'callback',
+                    dataType: 'jsonp',
+                    contentType: 'application/json'
+                }).done(function(e){
+                }).fail(function(e){
+                });
+
+                audioSession ={audioSessionId: evento.getAudioSession(), timestamp: evento.getTs(), audioId: evento.getAudioId() };
+                cookie.setCookie('audioSession',JSON.stringify(audioSession),0);
+
+                if(currentPosition < (audios.length-1) ){
+                    setAudio(currentPosition+1);
+                }
+            });
+
+
+		    $(document).ready(function(){
+                $("#jquery_jplayer_1").jPlayer({
+                    ready: function() {
+                                $(this).jPlayer("setMedia", {
+        
+                                                                    mp3: mp.replace("id",id)
+                                        
+                                });
+                    },
+                    loop: false,
+                    swfPath: "https://www.ivoox.com/js/jquery.jplayer.swf",
+                    preload: "none",
+                    autobuffer: false,
+                    autoplay: false,
+                    supplied: type
+                });
+
+                $("#jquery_jplayer_1").bind($.jPlayer.event.error + ".myProject", function(event) {
+                    if(countRetry >= 5){
+                        pause();
+                    }
+                    else{
+                        countRetry++;
+                        var time = $("#jquery_jplayer_1").data("jPlayer").status.currentTime;
+                        $("#jquery_jplayer_1").jPlayer("play", time);
+                    }
+                });
+                //if we are in domains specified for be utm changed rewrite utm term for href on downloads buttons
+                var valHrefDownload = $('#storeUrl').val();
+                var urlParent = (window.location != window.parent.location)
+                    ? document.referrer
+                    : document.location.href;
+
+                $portionsUrl = urlParent.split('/')
+                var urlEndString =$portionsUrl[$portionsUrl.length -2];
+                valHrefDownload = valHrefDownload.replace('-parentUrlIframeReplace-', urlEndString);
+                $('.isDownloadButton').attr('href',valHrefDownload);
+
+            });
+
+			function extractRootDomain(domain) {
+			   var splitArr = domain.split('.'),
+			       arrLen = splitArr.length;
+
+			   //extracting the root domain here if there is a subdomain
+			   if (arrLen > 2) {
+			       domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
+			       //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
+			       if (splitArr[arrLen - 1].length == 2 && splitArr[arrLen - 1].length == 2) {
+			           //this is using a ccTLD
+			           domain = splitArr[arrLen - 3] + '.' + domain;
+			       }
+			   }
+			   return domain;
+			}
+
+
+           function trackByDomain(action){
+               _gaq.push(['_trackEvent', 'embed_podcast', action, auxMyDomainName.hostname]);
+               console.log("_gaq.push(['_trackEvent', 'embed_podcast', '"+action+"', '"+auxMyDomainName.hostname+"']);");
+           }
+
+			function closeAndPlay(){
+				$("#listenOn").remove();
+				myPlay();
+				/*
+				$("#jquery_jplayer_1").jPlayer("play");
+				$('.jp-play2').hide();
+				$('.jp-pause2').show();
+				*/
+			}
+
+			function setIosInstallContext(context,object){
+				var osversion;
+
+				if ( navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPhone/i) )
+				{
+					var start = navigator.userAgent.indexOf( 'OS ' ) + 3;
+					var end = navigator.userAgent.indexOf( 'like ' ) - 1;
+					var length = end - start;
+					osversion = navigator.userAgent.substr( start, length).replace( /_/g, '.' );
+					$.ajax({
+						url:    "ajx-_v9_setIosInstallContext_1.html?osversion="+osversion+"&context="+context+"&object="+object,
+						type:   'POST',
+						success: function(resp){
+						}
+					});
+				}
+			}
+
+			function isMobileOperatingSystem() {
+	            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+	            if( userAgent.match( /iPad/i ) || userAgent.match( /iPhone/i ) || userAgent.match( /iPod/i ) ){
+	                return true;
+	            }
+	            else if( userAgent.match( /Android/i ) ){
+	                return true;
+	            }
+	            else{
+	                return false;
+	            }
+	        }
+
+		    function setAudio(position){
+                if (cookie !== undefined){
+                    cookie.delCookie('audioSession');
+                }
+                started_listen = playEventInfo.paused = false;
+                if (audios === undefined || typeof audios != 'object' || audios.length < 1){
+                    if(_DEBUG) console.log("INVALID audios ARRAY");
+                    return false;
+                }
+
+		    	currentPosition = position;
+        
+                var urlBase               = 'https://www.ivoox.com/';
+                var urlShareAudioBegin    = 'https://www.ivoox.com/ajx-enviar-audio_rs_';
+                var urlShareAudioEnd      = '_1.html';
+                var urlShareFacebook      = 'https://www.facebook.com/share.php?u=https://www.ivoox.com/';
+                var urlShareTwitterBegin  = 'https://twitter.com/intent/tweet?original_referer=https://www.ivoox.com/';
+                var urlShareTwitterMiddle = '&url=https://www.ivoox.com/';
+                var urlShareTwitterEnd    = '&text=';
+                var urlShareGplus         = 'https://plus.google.com/share?url=https://www.ivoox.com/';
+                var urlIframeBegin        = "<iframe id='audio_";
+                var urlIframeMiddle       = "' frameborder='0' allowfullscreen='' scrolling='no' height='200' style='border:1px solid #EEE; box-sizing:border-box; width:100%;' src='https://www.ivoox.com/player_ej_";
+                var urlIframeEnd          = "_4_1.html?c1=ff6600' loading='lazy'></iframe>";
+        
+                if(audios[position].format == 4){
+                    type = "m4a";
+                }
+                else{
+                    type = "mp3";
+                }
+
+		    	$("#jquery_jplayer_1").jPlayer("destroy");
+
+                $("#jquery_jplayer_1").jPlayer({
+                    loop: false,
+                    swfPath: "https://www.ivoox.com/js/jquery.jplayer.swf",
+                    preload: "none",
+                    autobuffer: false,
+                    autoplay: false,
+                    supplied: type
+                });
+
+                if(audios[position].format == 4){
+                    $("#jquery_jplayer_1").jPlayer("setMedia", {
+                        m4a: urlBase+"listenembeded_mn_"+audios[position].id+"_1.m4a?source=EMBEDEDHTML5"
+                    });
+		    	}
+                else {
+                    $("#jquery_jplayer_1").jPlayer("setMedia", {
+                        mp3: urlBase+"listenembeded_mn_"+audios[position].id+"_1.mp3?source=EMBEDEDHTML5"
+                    });
+		    	}
+
+                $("#embed_title").html(audios[position].titleRaw);
+		    	$("#embed_user").html("Por "+audios[position].user);
+		    	$("#embed_numcomments").html(audios[position].numcomments);
+		    	$("#embed_numrecomends").html(audios[position].numrecomends);
+		    	$("#embed_duration").html(audios[position].duration);
+		    	$("#embed_download").attr("href",urlBase+"audio_rf_"+audios[position].id+"_1.html");
+                $("#embed_subscribe").attr("href",urlBase+"_p2_"+audios[position].programId+"_1.html");
+		    	$("#embed_image").attr("src",audios[position].image);
+                $("#embed_urlshareaudio").attr("href",urlShareAudioBegin + audios[position].id + urlShareAudioEnd);
+                $("#embed_url_share_facebook").attr("href", urlShareFacebook + audios[position].id);
+                $("#embed_url_share_twitter").attr("href", urlShareTwitterBegin + audios[position].id + urlShareTwitterMiddle + audios[position].id + urlShareTwitterEnd + audios[position].shorttitle);
+                $("#embed_url_share_gplus").attr("href", urlShareGplus + audios[position].id);
+                $("#embed_iframe").val(urlIframeBegin + audios[position].id + urlIframeMiddle + audios[position].id + urlIframeEnd);
+		    	$(".audio").removeClass("selected");
+		    	$("#audio"+audios[position].id).addClass("selected");
+        
+
+                                $("#jquery_jplayer_1").jPlayer("play");
+                $('.jp-play2').hide();
+                $('.jp-pause2').show();
+                        
+		    	$.ajax({url: urlBase+"s_me_"+audios[position].id+"_1.html?source=EMBEDED", context: document.body});
+			}
+		
+
+        </script>
+
+	</head>
+	<body>
+		<div class="content">
+			<div id="listenOn" class="fullscreen-modal" style="display:none;">
+				<div class="pull-middle" style="text-align:center" id="containerButtonsMobile">
+
+                                            <a id="macro" href="https://www.ivoox.com/podcast_sq_f1277498_1.html?redirstore=1&referrer=utm_source%3Dembed_podcast%26utm_content%3DPODCAST_277498%26utm_medium%3Dweb%26utm_campaign%3D#DOMAIN#&ct=embed_podcast-#DOMAIN#" class="btn-default m-bottom-20" target="_blank" onclick="trackByDomain('escuchar_app');setIosInstallContext('PODCAST','277498');">
+                            Escuchar en App
+                        </a>
+                    
+					<a href="#" class="listenOn-close btn-default-outline btn-default-outline-black" onclick="trackByDomain('play_web');">
+						Reproducir en navegador
+					</a>
+                    <p class="txt-white" style="font-size:12px; margin:10px">Al reproducir aceptas el uso de cookies de iVoox. <a href="{$G_baseurl}/informacion-legal_il.html#cookies" target="_blank">Mas Info</a></p>
+				</div>
+			</div>
+
+		<div id="jquery_jplayer_1"></div>
+		<div id="jp_container_0">
+            <input type="hidden" id="storeUrl" value="https://go.ivoox.com/app/referrer=utm_source%3Dembeded%26utm_medium%3Dem_ads%26utm_campaign%3Dget_app">
+            <!--gdpr-->
+                <div class="gdpr-box" style="display: none">
+                    <div style="display: block; margin-top: 50px;">
+                        <p class="txt-white">Al reproducir este audio aceptas el uso de cookies de Ivoox, incluyendo estadísticas. <a href="{$G_baseurl}/informacion-legal_il.html#cookies" target="_blank" class="txt-white">Mas Info</a></p>
+						<button class="btn btn-default btn-sm"  onclick="acceptGDPR();">
+							Aceptar
+						</button>
+                    </div>
+                </div>
+                <!--fin gdpr-->
+			<div class="clear"></div>
+			<div id="jp_image" class="hidden-xs content-img-new">
+				<span class="helper"></span><img id="embed_image" src="https://static-1.ivoox.com/audios/0/9/8/4/4231596014890_SM.jpg" alt="embed image" />
+            </div>
+			<div id="jp_container_1" class="jp-audio">
+				<div class="jp-type-single">
+
+                <div id="jq_redes_sociales" class="redes-sociales" style="display:none">
+                    <div class="fl-right m-top-5" style="width:12px;">
+                        <a id="jq_redes_sociales_close" href="/" class="icon-close"></a>
+                    </div>
+                    <p>Comparte este audio en tus redes sociales</p>
+                    <div style="display:table-row">
+                        <a id="embed_url_share_facebook" target="_blank" href="https://www.facebook.com/share.php?u=https://www.ivoox.com/54532944" class="icon-facebook"></a>
+                        <a id="embed_url_share_twitter"  target="_blank" href="https://twitter.com/intent/tweet?original_referer=https://www.ivoox.com/54532944&url=https://www.ivoox.com/54532944&text=Espa&ntilde;a y los Reyes Cat&oacute;licos. Alberto Barcena, profesor de historia y doctrina social de la Iglesia de..." class="icon-twitter"></a>
+                    </div>
+                    <p>Llévate este audio a tu web blog</p>
+                    <div class="m-top-5">
+                        <label>Embed</label>
+                        <input id="embed_iframe" type="text" onclick="this.focus();this.select();" value="<iframe id='audio_54532944' frameborder='0' allowfullscreen='' scrolling='no' height='200' style='border:1px solid #EEE; box-sizing:border-box; width:100%;' src='https://www.ivoox.com/player_ej_54532944_4_1.html?c1=ff6600' loading='lazy'></iframe>">
+                    </div>
+                </div>
+						<div id="jq_default" class="jp_right_3_3 p-top-0 h-106">
+
+							<div class="jp_right_2">
+
+								<div class="jp-title">
+									<div style="height:70px;">
+									<!-- uploader info -->
+									<span id="embed_user" class="">Por </span>
+									<!-- titulo del audio -->
+									<p id="embed_title" class="title truncate">España y los Reyes Católicos. Alberto Barcena, profesor de historia y doctrina social de la Iglesia de la San Pablo CEU.</p>
+
+                                    <!-- comments y likes -->
+                                    <div class="jp_right_3_3 m-top-5">
+                                        <div class="icons">
+                                                                                                                                </div>
+                                    </div>
+
+                                    <ul class="actions">
+                                        <li>
+                                            <!-- download btn -->
+                                            <a id="embed_download" class="icon-download orange" href="https://www.ivoox.com/-audios-mp3_rf_54532944_1.html" title="Descargar audio" target="_blank"><span id="desc_player" class="hide-419">Descarga</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="https://www.ivoox.com/_p2_277498_1.html" class="icon-rss font-11 orange" target="_blank" id="embed_subscribe" title="Suscribirse"><span class="orange hide-419">
+                                                Suscribirse
+                                            </span></a>
+                                        </li>
+                                        <li>
+                                            <a id="btn_share_social" href="javascript:void(0);" class="icon-share orange" target="_blank" title="Compartir este audio" >
+                                                    <span class="hide-490">Compartir</span>
+                                            </a>
+                                        </li>
+
+                                    </ul>
+                                    <div class="clearfix"></div>
+                                    <div class="btn-apps">
+                                                                                    <a  onclick="trackByDomain('get_app');"
+                                                href="https://go.ivoox.com/app?utm_source=embed_podcast&utm_medium=web&utm_campaign=get_app"
+                                                target="_blank">
+                                                <img src="https://static-1.ivoox.com/img/es_badge_web_generic.png" class="btn-align-playstore-51 m-left-10n">
+                                            </a>
+
+                                            <a  onclick="trackByDomain('get_app');"
+                                                href="https://go.ivoox.com/app?utm_source=embed_podcast&utm_medium=web&utm_campaign=get_app"
+                                                target="_blank">
+                                                <img src="https://static-1.ivoox.com/img/badge-download-on-the-app-store-es.svg" class="btn-align-appstore-51">
+                                            </a>
+                                                                            </div>
+								    </div>
+
+								</div>
+							</div>
+
+						</div>
+						<div class="clear"></div>
+						<div class="jp_right_3" style="height:43px">
+								<div>
+									<!-- jp-duration -->
+									<div class="jp-time-holder">
+										<div class="duration" id="embed_duration">29:51</div>
+									</div>
+								</div>
+
+								<div>
+									<!-- jp-current-time -->
+									<div class="jp-time-holder">
+										<div class="jp-current-time"></div>
+									</div>
+								</div>
+								<div class="jp_right_3_3">
+									<div class="fl-left">
+										<!-- jp-controls -->
+										<ul class="jp-controls m-right-5">
+											<li><a href="javascript:;" class="jp-play2" tabindex="1" onclick="myPlay()"></a></li>
+											<li><a href="javascript:;" class="jp-pause2" tabindex="1" onclick="pause();"></a></li>
+										</ul>
+									</div>
+									<!-- jp-progress -->
+									<div class="jp-progress">
+										<div class="jp-seek-bar">
+											<div class="jp-play-bar"></div>
+										</div>
+									</div>
+
+								</div>
+								<div class="clear"></div>
+
+							</div>
+							<div>
+
+
+
+							</div>
+	<div class="clear"></div>
+					<div class="jp-no-solution">
+						<span>Update Required</span>
+						To play the media you will need to either update your browser to a recent version or update your <a href="https://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+					</div>
+				</div>
+			</div>
+		</div>
+				<div class="clear"></div>
+                                <div id="audiolistwrapper" style="height: 210px; overflow: auto">
+                                    <div id='audiolist2'
+                                        data-trigger="ajax_pagination"
+                                        data-wrapper="#audiolistwrapper"
+                                        data-type="infinite"
+                                        data-status="enabled"
+                                        data-href="player_es_podcast_277498"
+                                        data-href-after=""
+                                        data-page="2"
+                                        data-target="#audiolist2"
+                                        data-loading-text="Cargando"
+                                        data-loader="https://static-1.ivoox.com/images/loader.gif"
+                                       >
+                                                                                    <a class="audio selected" id="audio54532944" href="javascript:void(0);" onclick="setAudio(0);">España y los Reyes Católicos. Alberto Barcena, profesor de historia y doctrina social de la Iglesia de la San Pablo CEU.</a>
+                                                                                    <a class="audio" id="audio54532903" href="javascript:void(1);" onclick="setAudio(1);">Consensuar una nueva Ley Educativa. Carlos Conde Solares, coordinador del Foro de Profesores (@foroprofesores).</a>
+                                                                                    <a class="audio" id="audio54532826" href="javascript:void(2);" onclick="setAudio(2);">Cambiar la Ley Electoral. Lorenzo Abadía, empresario, analista político y promotor de la Campaña #OtraLeyElectoral.</a>
+                                                                                    <a class="audio" id="audio54229583" href="javascript:void(3);" onclick="setAudio(3);">La entrevista de Hendaya. Rafael Rodrigo (@kappo250), Doctor en Historia contemporánea.</a>
+                                                                                    <a class="audio" id="audio54229173" href="javascript:void(4);" onclick="setAudio(4);">El pensamiento progresista. Juan Carlos Jimenez, catedrático de Historia del Pensamiento Universidad CEU San Pablo.</a>
+                                                                                    <a class="audio" id="audio54228955" href="javascript:void(5);" onclick="setAudio(5);">El Estado Liberal. Carlos Gregorio Hernández (@carlosghh), profesor de Historia Contemporánea Universidad CEU San Pablo.</a>
+                                                                                    <a class="audio" id="audio53976118" href="javascript:void(6);" onclick="setAudio(6);">Algo de historia de la economía española. Javier Morillas (javierbarcabo), catedrático de economía aplicada.</a>
+                                                                                    <a class="audio" id="audio53562407" href="javascript:void(7);" onclick="setAudio(7);">El Ejército y la transición española. Pablo González-Pola de la Granja, profesor de la Universidad San Pablo CEU</a>
+                                                                                    <a class="audio" id="audio53310399" href="javascript:void(8);" onclick="setAudio(8);">Educación Especial. José María Escudero, presidente de la Plataforma 'Educación Inclusiva Sí, Especial también'</a>
+                                                                                    <a class="audio" id="audio53152052" href="javascript:void(9);" onclick="setAudio(9);">PSOE en la historia. Francisco Torres García, historiador, catedrático de secundaria,</a>
+                                                                                    <a class="audio" id="audio52923375" href="javascript:void(10);" onclick="setAudio(10);">No tenemos la mejor sanidad del mundo. Luis De Miguel Ortega, un enfermero con toga</a>
+                                                                                    <a class="audio" id="audio48865821" href="javascript:void(11);" onclick="setAudio(11);">Escrutinio General, ¿cuándo se hará? José Roberto Roca Torregrosa, presidente de DCID, impulsador de @ETransparentes.</a>
+                                                                                    <a class="audio" id="audio48833751" href="javascript:void(12);" onclick="setAudio(12);">Alfonso XIII. Javier García-Bernal (@gbernaljavier), abogado especializado seguros y escritor de temas históricos.</a>
+                                                                                    <a class="audio" id="audio48800688" href="javascript:void(13);" onclick="setAudio(13);">Podemos quiere espacios 'Judenfrei'. Juan Hernández, Director de Comunicación de ACOM (@ACOM_es)</a>
+                                                                                    <a class="audio" id="audio48708961" href="javascript:void(14);" onclick="setAudio(14);">Feminismo e igualdad. Leonor Tamayo (@TamayoLeonor). Presidente de Women of the World (@wow_platform).</a>
+                                                                                    <a class="audio" id="audio48600294" href="javascript:void(15);" onclick="setAudio(15);">Custodia compartida. Juan Fco Solichero (@JSolichero), miembro de la ejecutiva de la Asociación Aire.</a>
+                                                                                    <a class="audio" id="audio48552174" href="javascript:void(16);" onclick="setAudio(16);">Legado español en EEEUU. Juan Ignacio Güenechea (@ji_guenechea); coordinador de The Hispanic Council (@hispaniccouncil).</a>
+                                                                                    <a class="audio" id="audio48495010" href="javascript:void(17);" onclick="setAudio(17);">Antifeminista y antimachista. María Godoy, licenciada en Historia y escritora.</a>
+                                                                                    <a class="audio" id="audio48449449" href="javascript:void(18);" onclick="setAudio(18);">Covid-19: higiene y tranquilidad. Dr. Justo Menéndez, jefe del Dpto de Urgencias de HM Hospitales en Madrid</a>
+                                                                                    <a class="audio" id="audio48321731" href="javascript:void(19);" onclick="setAudio(19);">La Ciencia podrá con el coronavirus. Rafael Delgado Jefe de Servicio de Microbiología Hospital 12 de Octubre.</a>
+                                                                            </div>
+                                </div>
+				<div class="clear"></div>
+				<div class="logo-ivoox fl-right m-top-10">
+					<!-- ivoox link with image -->
+					<a href="https://www.ivoox.com/" target="_blank" title="Visitar www.ivoox.com"></a>
+				</div>
+
+			</div>
+		</body>
+
+		
+		<script type="text/javascript">
+		       	
+
+		function myPlay(){
+			var cookiePolicyAccepted = getCookie('cookies_policy_accepted');
+
+			console.log("cookiePolicyAccepted: "+cookiePolicyAccepted);
+			console.log("showAds: "+showAds);
+
+			if(!cookiePolicyAccepted){
+				//Muestro la Capa de la GDPR
+				showGDPRAlert();
+			}
+			else if(showAds == true){
+				//Anuncio preroll
+				console.log('showYumePlayAd');
+				showYumePlayAd();
+			}
+			else{
+				//Reproducción del audio
+				play();
+			}
+		}
+
+		function showGDPRAlert(){
+			$(".gdpr-box").show();
+		}
+		function hideGDPRAlert(){
+			$(".gdpr-box").hide();
+		}
+
+		function acceptGDPR(){
+			$.post(G_baseurl + 'ajx-manage-policy_v9_acceptCookiePolicy_1.html',function(){
+				hideGDPRAlert();
+			});
+            if(showAds == true){
+				//Anuncio preroll
+				console.log('showYumePlayAd');
+				showYumePlayAd();
+			}
+			else{
+				//Reproducción del audio
+				play();
+			}
+		}
+
+       		function play(){
+       			$('#jquery_jplayer_1').jPlayer('play');
+       			$('.jp-play2').hide();
+		    	$('.jp-pause2').show();
+       		}
+       		function pause(){
+		       	$('#jquery_jplayer_1').jPlayer('pause');
+		       	$('.jp-play2').show();
+		    	$('.jp-pause2').hide();
+	       	}
+       	
+       		$('.jp-pause2').hide();
+
+                $('#btn_share_social').click(function(){
+                    $("#jq_redes_sociales").show();
+                    $("#jq_default").hide();
+                    return false;
+                });
+
+                $('#jq_redes_sociales_close').click(function(){
+                    $("#jq_default").show();
+                    $("#jq_redes_sociales").hide();
+                    return false;
+                });
+	</script>
+
+	<script type="text/javascript">
+
+		var myDomainName = (window.location != window.parent.location) ? document.referrer : document.location.href;
+		var player = null;
+		var auxMyDomainName = null;
+		var macroElmt = null;
+
+		var onload = function(){
+			//Configuración del player
+			player = {"show_listenOn_modal":1};
+		
+			if(isMobileOperatingSystem()){
+				if(player && player.show_listenOn_modal == 1){
+					$("#listenOn").show();
+				}
+			}
+
+			auxMyDomainName = document.createElement('a');
+			auxMyDomainName.href = myDomainName;
+
+			macroElmt = $("#listenOn a#macro");
+
+			if(macroElmt.length){
+				macroElmt.attr('href',macroElmt.attr('href').replace(new RegExp('#DOMAIN#','g'),extractRootDomain(auxMyDomainName.hostname)));
+			}
+
+			$(".listenOn-close").click(function(e){
+                e.preventDefault();
+                 closeAndPlay();
+            });
+		
+
+		};
+	</script>
+
+</html>
