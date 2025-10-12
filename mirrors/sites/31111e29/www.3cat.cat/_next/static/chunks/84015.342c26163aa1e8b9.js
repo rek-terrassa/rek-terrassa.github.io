@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[84015],{84015:function(t,e,a){a.r(e);var s=a(73958),n=a(81742),u=a.n(n),c=a(52322);e.default=function(t){var e=t.text;return(0,c.jsx)(s.default,{text:e,dataTestId:"cos-noticia-text",className:u().textNoti})}}}]);
+//# sourceMappingURL=84015.342c26163aa1e8b9.js.map
